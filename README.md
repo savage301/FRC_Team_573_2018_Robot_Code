@@ -26,9 +26,13 @@ Other things on this drive would be controller button layouts, reference documen
 
 We will be using C++ this year for our robot code and Labview for our driver station. The WPILib provides libraries for FRC teams to use in their robot code as well as walk through tutuorials. Both of these will be very important resources for you to use during the year.
 
-The tutorials can be found here https://wpilib.screenstepslive.com/s/currentCS/m/cpp (Make sure you are looking at the 2018 control system pages)
+The tutorials can be found here https://wpilib.screenstepslive.com/s/currentCS/m/cpp
 
 The WPILib C++ API help can be found here. http://first.wpi.edu/FRC/roborio/release/docs/cpp/ 
+
+------- LimeLight ---------
+
+We have ordered a LimeLight camera for use this season. It should arrive week 1 of build. There website is https://limelightvision.io/ and there documentation can be found at http://docs.limelightvision.io/en/latest/
 
 ------ Code Structure ---------
 
