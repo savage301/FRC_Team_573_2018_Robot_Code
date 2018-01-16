@@ -182,7 +182,8 @@ public:
 	float targetArea = table->GetNumber("ta",0);
 	float targetSkew = table->GetNumber("ts",0);
 
-	void TestPeriodic() override {}
+	void TestPeriodic() override {
+	}
 
 private:
 	// Have it null by default so that if testing teleop it
