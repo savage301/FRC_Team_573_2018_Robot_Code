@@ -16,7 +16,8 @@ public:
 	Log();
 	string dateAndTime();
 	void Create();
-	void PDP(int slot, double limit, double val, bool override);
+	string RandomNum();
+	void PDP(int slot, double limit, bool override);
 	void Write(string text);
 	void Close();
 };

@@ -20,6 +20,7 @@
 #include "RobotMap.h"
 #include "NetworkTables/NetworkTable.h"
 #include <iostream>
+#include <Subsystems/Log.h>
 
 class Robot : public frc::TimedRobot {
 public:
@@ -28,6 +29,7 @@ public:
 	frc::Joystick controller2{ Driver2 };  // only joystick
 	Drive MyDrive;
 	Appendage MyAppendage;
+	Log myLog;
 
 
 
@@ -47,6 +49,7 @@ public:
 	 */
 	void DisabledInit() override {
 
+		myLog.Close();
 
 	}
 
@@ -97,6 +100,9 @@ public:
 			m_autonomousCommand->Cancel();
 			m_autonomousCommand = nullptr;
 		}
+
+		myLog.Create();
+
 	}
 
 	void TeleopPeriodic() override {
@@ -140,6 +146,9 @@ public:
 		else {
 			MyAppendage.Claw(0);
 		}
+
+		//myLog.Write("Test Output");
+		myLog.PDP(1, 5, true);
 
 //--------------------------------------------------------------------------------------
 
