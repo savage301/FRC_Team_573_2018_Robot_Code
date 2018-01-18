@@ -19,6 +19,7 @@ public:
 	Drive();
 	void InitDefaultCommand();
 	void TankDrive(double left, double right);
+	void CameraCenter(double y);
 };
 
 #endif  // Drive_H

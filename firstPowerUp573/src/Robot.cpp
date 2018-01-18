@@ -109,11 +109,25 @@ public:
 
 		frc::Scheduler::GetInstance()->Run();
 
-// --------------- Teleop Joystick controlled driving --------------------------------------
+// --------------- Basic Driving --------------------------------------
+
 		double leftin = controller1.GetRawAxis(1); //Get Drive Left Joystick Y Axis Value
 		double rightin = controller1.GetRawAxis(5); //Get Drive right Joystick Y Axis Value
+		bool AButton = controller1.GetRawButton(1);
+
 		MyDrive.TankDrive(leftin,rightin); //Pass to Tank Drive Function
 // ------------------------------------------------------------------------------------------
+// ------------Camera Aided Driving ----------------------
+
+		if(AButton) {
+
+			MyDrive.CameraCenter(leftin);
+
+		} else {
+
+			MyDrive.TankDrive(leftin,rightin); //Pass to Tank Drive Function
+
+		}
 
 // ----------------------------Claw Control----------------------------
 		double clawinraw = controller2.GetRawAxis(2);
