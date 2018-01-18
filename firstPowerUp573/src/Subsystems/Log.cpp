@@ -54,9 +54,13 @@ void Log::PDP(int slot, double limit, bool override) {
 
 	double val = board.GetCurrent(slot);
 
+	if(val > limit || override){
 	string output = /*dateAndTime() + "," + */to_string(slot) + "," + to_string(limit) + "," + to_string(val) + "," + to_string(override);
 
+
 	Write(output);
+	}
+
 
 }
 
