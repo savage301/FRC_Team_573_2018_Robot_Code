@@ -12,8 +12,8 @@ Drive::Drive() : Subsystem("Drive") {
 	LeftDrive = new Talon(LeftDrivePWM);
 	RightDrive = new Talon(RightDrivePWM);
 	MyGyro = new ADXRS450_Gyro();
-	LeftDriveEncoder = new Encoder(0, 1, true, k4x);
-	RightDriveEncoder = new Encoder(2, 3, false, k4x);
+	//LeftDriveEncoder = new Encoder(0, 1, true, k4x);
+	//RightDriveEncoder = new Encoder(2, 3, false, k4x);
 
 }
 
@@ -103,7 +103,7 @@ void Drive::GyroSetpoint(double degrees) {
 
 }
 
-void Drive::EncoderSetpoint() {
+/*void Drive::EncoderSetpoint() {
 
 	//Wheel moves 2.17 inches per motor revolution
 	//Calculating distance covered by robot through encoder
@@ -113,7 +113,7 @@ void Drive::EncoderSetpoint() {
 
 	double leftDistance = leftEncoderVal * 2.17 / 40;
 	double rightDistance = rightEncoderVal * 2.17 / 40;
-}
+}*/
 
 void Drive::GyroReset() {
 
