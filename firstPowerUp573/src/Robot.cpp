@@ -38,6 +38,10 @@ public:
 		m_chooser.AddObject("My Auto", &m_myAuto);
 		frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
+		//std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
+
+		//table->PutNumber("ledMode",1);
+
 	}
 
 	/**
@@ -111,9 +115,17 @@ public:
 
 // --------------- Basic Driving --------------------------------------
 
-		double leftin = controller1.GetRawAxis(1); //Get Drive Left Joystick Y Axis Value
-		double rightin = controller1.GetRawAxis(5); //Get Drive right Joystick Y Axis Value
+		double leftin = pow(controller1.GetRawAxis(1), 3); //Get Drive Left Joystick Y Axis Value
+		double rightin = pow(controller1.GetRawAxis(5), 3); //Get Drive right Joystick Y Axis Value
 		bool AButton = controller1.GetRawButton(1);
+		bool BButton = controller1.GetRawButton(2);
+		bool XButton = controller1.GetRawButton(3);
+
+		/*if (abs(leftin) < .025)
+			leftin = 0;
+
+		if(abs(rightin) < .025)
+			rightin = 0;*/
 
 		MyDrive.TankDrive(leftin,rightin); //Pass to Tank Drive Function
 // ------------------------------------------------------------------------------------------
@@ -123,11 +135,20 @@ public:
 
 			MyDrive.CameraCenter(leftin);
 
+		} else if(BButton) {
+
+			MyDrive.GyroSetpoint(90);
+
 		} else {
 
 			MyDrive.TankDrive(leftin,rightin); //Pass to Tank Drive Function
 
 		}
+
+		if(XButton)
+			MyDrive.GyroReset();
+
+//--------------Gyro Setpoint Driving-----------------------
 
 // ----------------------------Claw Control----------------------------
 		double clawinraw = controller2.GetRawAxis(2);
@@ -197,13 +218,6 @@ public:
 
 //---------------------------------------------------------------------------------------
 
-//------------------------ vision -----------------------------
-
-	std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
-	float targetOffsetAngle_Horizontal = table->GetNumber("tx",0);
-	float targetOffsetAngle_Vertical = table->GetNumber("ty",0);
-	float targetArea = table->GetNumber("ta",0);
-	float targetSkew = table->GetNumber("ts",0);
 
 	void TestPeriodic() override {}
 
