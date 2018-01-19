@@ -45,3 +45,9 @@ Please feel free to add sections to this readme or create others as you see fit 
 -------- Questions -------
 
 If you have any questions please contact Coach Eric.
+
+------- Kevan's To-Do's ---------
+
+ ~ Date and time for logging
+
+ ~ Turning off camera lights in RobotInit

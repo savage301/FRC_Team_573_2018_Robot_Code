@@ -20,6 +20,7 @@
 #include "RobotMap.h"
 #include "NetworkTables/NetworkTable.h"
 #include <iostream>
+#include <Subsystems/Log.h>
 
 class Robot : public frc::TimedRobot {
 public:
@@ -28,6 +29,7 @@ public:
 	frc::Joystick controller2{ Driver2 };  // only joystick
 	Drive MyDrive;
 	Appendage MyAppendage;
+	Log myLog;
 
 
 
@@ -35,6 +37,10 @@ public:
 		m_chooser.AddDefault("Default Auto", &m_defaultAuto);
 		m_chooser.AddObject("My Auto", &m_myAuto);
 		frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
+
+		//std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
+
+		//table->PutNumber("ledMode",1);
 
 	}
 
@@ -47,6 +53,7 @@ public:
 	 */
 	void DisabledInit() override {
 
+		myLog.Close();
 
 	}
 
@@ -97,17 +104,51 @@ public:
 			m_autonomousCommand->Cancel();
 			m_autonomousCommand = nullptr;
 		}
+
+		myLog.Create();
+
 	}
 
 	void TeleopPeriodic() override {
 
 		frc::Scheduler::GetInstance()->Run();
 
-// --------------- Teleop Joystick controlled driving --------------------------------------
-		double leftin = controller1.GetRawAxis(1); //Get Drive Left Joystick Y Axis Value
-		double rightin = controller1.GetRawAxis(5); //Get Drive right Joystick Y Axis Value
+// --------------- Basic Driving --------------------------------------
+
+		double leftin = pow(controller1.GetRawAxis(1), 3); //Get Drive Left Joystick Y Axis Value
+		double rightin = pow(controller1.GetRawAxis(5), 3); //Get Drive right Joystick Y Axis Value
+		bool AButton = controller1.GetRawButton(1);
+		bool BButton = controller1.GetRawButton(2);
+		bool XButton = controller1.GetRawButton(3);
+
+		/*if (abs(leftin) < .025)
+			leftin = 0;
+
+		if(abs(rightin) < .025)
+			rightin = 0;*/
+
 		MyDrive.TankDrive(leftin,rightin); //Pass to Tank Drive Function
 // ------------------------------------------------------------------------------------------
+// ------------Camera Aided Driving ----------------------
+
+		if(AButton) {
+
+			MyDrive.CameraCenter(leftin);
+
+		} else if(BButton) {
+
+			MyDrive.GyroSetpoint(90);
+
+		} else {
+
+			MyDrive.TankDrive(leftin,rightin); //Pass to Tank Drive Function
+
+		}
+
+		if(XButton)
+			MyDrive.GyroReset();
+
+//--------------Gyro Setpoint Driving-----------------------
 
 // ----------------------------Claw Control----------------------------
 		double clawinraw = controller2.GetRawAxis(2);
@@ -140,6 +181,9 @@ public:
 		else {
 			MyAppendage.Claw(0);
 		}
+
+		//myLog.Write("Test Output");
+		myLog.PDP(15, 5, false);
 
 //--------------------------------------------------------------------------------------
 
@@ -174,13 +218,6 @@ public:
 
 //---------------------------------------------------------------------------------------
 
-//------------------------ vision -----------------------------
-
-	std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
-	float targetOffsetAngle_Horizontal = table->GetNumber("tx",0);
-	float targetOffsetAngle_Vertical = table->GetNumber("ty",0);
-	float targetArea = table->GetNumber("ta",0);
-	float targetSkew = table->GetNumber("ts",0);
 
 	void TestPeriodic() override {
 	}
