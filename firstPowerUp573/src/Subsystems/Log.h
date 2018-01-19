@@ -14,7 +14,7 @@ private:
 
 public:
 	Log();
-	string dateAndTime();
+	//string dateAndTime();
 	void Create();
 	string RandomNum();
 	void PDP(int slot, double limit, bool override);

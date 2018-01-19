@@ -16,11 +16,11 @@ Log::Log() : Subsystem("Drive") {
 
 }
 
-string Log::dateAndTime() {
+//string Log::dateAndTime() {
 
 
 
-}
+//}
 
 string Log::RandomNum() {
 
