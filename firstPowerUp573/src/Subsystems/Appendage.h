@@ -3,6 +3,7 @@
 
 #include <Commands/Subsystem.h>
 #include <WPILib.h>
+#include <Encoder.h>
 using namespace std;
 
 class Appendage : public Subsystem {
@@ -24,14 +25,21 @@ DoubleSolenoid * Brake;
 DoubleSolenoid * Ramp1;
 DoubleSolenoid * Ramp2;
 
+DigitalInput * Boxlightgate;
+
+Encoder * ElevatorEncoder;
 
 
+
+
+void ElevPID(double POS);
 public:
 Appendage();
 	void InitDefaultCommand();
 	void Claw(double speed);
 	void Elevator(double Joystick, bool a, bool b, bool x, bool y);
 	void Ramp(bool Button1);
+
 };
 
 

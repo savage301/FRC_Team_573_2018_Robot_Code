@@ -41,6 +41,12 @@ constexpr int Ramp1Port2 = 3;
 constexpr int Ramp2Port1 = 4;
 constexpr int Ramp2Port2 = 5;
 
+constexpr int BoxlightgateDIO = 6;
+
+constexpr int ElevatorEncoder1 = 4;
+constexpr int ElevatorEncoder2 = 5;
+
+
 
 
 

@@ -219,7 +219,8 @@ public:
 //---------------------------------------------------------------------------------------
 
 
-	void TestPeriodic() override {}
+	void TestPeriodic() override {
+	}
 
 private:
 	// Have it null by default so that if testing teleop it
