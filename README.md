@@ -36,7 +36,13 @@ We have ordered a LimeLight camera for use this season. It should arrive week 1 
 
 ------ Code Structure ---------
 
-I don't know how we will structure the code yet, but as we decide this section will be updated.
+Main code is in Robot.cpp
+
+Created the following subsystem code files containing fucntions to be called in Robot.cpp
+ -Drive.cpp
+ -Appendage.cpp
+ -Log.cpp
+ -Auto.cpp
 
 ------- Anything Else --------
 
@@ -45,6 +51,10 @@ Please feel free to add sections to this readme or create others as you see fit 
 -------- Questions -------
 
 If you have any questions please contact Coach Eric.
+
+------- Major Commit History ---
+
+Combined Kevan and Chase branches on 1/19 into master, then recreated the branches.
 
 ------- Kevan's To-Do's ---------
 
