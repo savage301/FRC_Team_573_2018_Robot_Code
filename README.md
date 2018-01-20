@@ -61,3 +61,7 @@ Combined Kevan and Chase branches on 1/19 into master, then recreated the branch
  ~ Date and time for logging
 
  ~ Turning off camera lights in RobotInit
+ 
+ ------ Chase To- Do's ---------
+ 
+ ~ Have compressor auto turn off when drive wheels get 70% + PWM signal.
