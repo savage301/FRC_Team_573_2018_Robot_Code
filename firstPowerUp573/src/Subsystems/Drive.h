@@ -3,6 +3,7 @@
 
 #include <Commands/Subsystem.h>
 #include <WPILib.h>
+#include <Encoder.h>
 using namespace std;
 
 class Drive : public Subsystem {
@@ -15,8 +16,8 @@ Talon * LeftDrive;
 Talon * RightDrive;
 RobotDrive * MyRobotDrive;
 ADXRS450_Gyro * MyGyro;
-//Encoder * LeftDriveEncoder;
-//Encoder * RightDriveEncoder;
+Encoder * LeftDriveEncoder;
+Encoder * RightDriveEncoder;
 
 public:
 	Drive();
@@ -25,7 +26,8 @@ public:
 	void CameraCenter(double y);
 	void GyroSetpoint(double degrees);
 	void GyroReset();
-	//void EncoderSetpoint();
+	void EncoderSetpoint(double setpoint);
+	void EncoderReset();
 };
 
 #endif  // Drive_H

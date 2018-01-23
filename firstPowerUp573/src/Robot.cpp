@@ -15,6 +15,7 @@
 #include <Joystick.h>
 #include <Subsystems/Drive.h>
 #include <Subsystems/Appendage.h>
+#include <Subsystems/Autonomous.h>
 #include "Commands/ExampleCommand.h"
 #include "Commands/MyAutoCommand.h"
 #include "RobotMap.h"
@@ -30,6 +31,7 @@ public:
 	Drive MyDrive;
 	Appendage MyAppendage;
 	Log myLog;
+	Autonomous myAuto;
 
 
 
@@ -89,6 +91,9 @@ public:
 		if (m_autonomousCommand != nullptr) {
 			m_autonomousCommand->Start();
 		}
+
+		myAuto.ModeSelect();
+
 	}
 
 	void AutonomousPeriodic() override {
@@ -120,14 +125,10 @@ public:
 		bool AButton = controller1.GetRawButton(1);
 		bool BButton = controller1.GetRawButton(2);
 		bool XButton = controller1.GetRawButton(3);
+		bool YButton = controller1.GetRawButton(4);
+		bool LBButton = controller1.GetRawButton(5);
 
-		/*if (abs(leftin) < .025)
-			leftin = 0;
-
-		if(abs(rightin) < .025)
-			rightin = 0;*/
-
-		MyDrive.TankDrive(leftin,rightin); //Pass to Tank Drive Function
+		//MyDrive.TankDrive(leftin,rightin); //Pass to Tank Drive Function
 // ------------------------------------------------------------------------------------------
 // ------------Camera Aided Driving ----------------------
 
@@ -139,6 +140,10 @@ public:
 
 			MyDrive.GyroSetpoint(90);
 
+		} else if(YButton) {
+
+			MyDrive.EncoderSetpoint(108);
+
 		} else {
 
 			MyDrive.TankDrive(leftin,rightin); //Pass to Tank Drive Function
@@ -148,7 +153,8 @@ public:
 		if(XButton)
 			MyDrive.GyroReset();
 
-//--------------Gyro Setpoint Driving-----------------------
+		if(LBButton)
+			MyDrive.EncoderReset();
 
 // ----------------------------Claw Control----------------------------
 		double clawinraw = controller2.GetRawAxis(2);
@@ -182,8 +188,7 @@ public:
 			MyAppendage.Claw(0);
 		}
 
-		//myLog.Write("Test Output");
-		myLog.PDP(15, 5, false);
+		myLog.PDP(1, 5, true);
 
 //--------------------------------------------------------------------------------------
 
