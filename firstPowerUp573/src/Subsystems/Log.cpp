@@ -14,6 +14,7 @@ using namespace std;
 
 ofstream outText;
 frc::PowerDistributionPanel board;
+int counter;
 
 Log::Log() : Subsystem("Drive") {
 
@@ -89,6 +90,42 @@ void Log::PDP(int slot, double limit, bool override) {
 }
 
 
+}
+
+void Log::PDPTotal(){
+	double val = board.GetTotalCurrent();
+	bool light;
+
+	if (val > 1){
+		counter = counter + 1;
+		if (counter > 50){
+			light = true;
+		}
+		else{
+			light = false;
+		}
+	}
+	else {
+		counter = 0;
+		light = false;
+	}
+
+	frc::SmartDashboard::PutBoolean("!! OVER 400 AMPS !!", light);
+	auto Gyrooutstr = std::to_string(counter);
+	frc::SmartDashboard::PutString("DB/String 5",Gyrooutstr);
+}
+
+void Log::DrivetrainCurrentCompare(int slot,double PWMin){
+
+	double current = board.GetCurrent(slot);
+
+	if (abs(PWMin) > .2){
+		if (abs(current) < 1){
+			string output = "!----PDP Slot" + to_string(slot) + "is not getting enough current when driven";
+			Write(output);
+			frc::SmartDashboard::PutString("Slot Not Getting Current",to_string(slot));
+		}
+	}
 }
 
 void Log::Close() {

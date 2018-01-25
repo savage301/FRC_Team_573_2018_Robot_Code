@@ -26,9 +26,8 @@ constexpr int LeftDrivePWM = 0;
 constexpr int RightDrivePWM = 1;
 
 constexpr int ClawMotorLeft1PWM = 3;
-constexpr int ClawMotorLeft2PWM = 4;
-constexpr int ClawMotorRight1PWM = 5;
-constexpr int ClawMotorRight2PWM = 6;
+constexpr int ClawMotorRight1PWM = 4;
+
 
 constexpr int ElevatorPWM = 2;
 

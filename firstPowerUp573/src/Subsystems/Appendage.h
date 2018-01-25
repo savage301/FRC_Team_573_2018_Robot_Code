@@ -13,9 +13,9 @@ private:
 	// It's desirable that everything possible under private except
 	// for methods that implement subsystem capabilities
 Talon * ClawMotorLeft1;
-Talon * ClawMotorLeft2;
+
 Talon * ClawMotorRight1;
-Talon * ClawMotorRight2;
+
 
 Talon * Elevator1;
 Talon * Elevator2;
@@ -41,7 +41,9 @@ Appendage();
 	void Claw(double speed);
 	void Elevator(double Joystick, bool a, bool b, bool x, bool y);
 	void Ramp(bool Button1);
+	void LightGateGet();
 	void GetDistanceUltrasonic();
+
 
 };
 
