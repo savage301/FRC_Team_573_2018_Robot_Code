@@ -45,6 +45,8 @@ constexpr int BoxlightgateDIO = 6;
 constexpr int ElevatorEncoder1 = 4;
 constexpr int ElevatorEncoder2 = 5;
 
+constexpr int UltrasonicPort = 0;
+
 
 
 

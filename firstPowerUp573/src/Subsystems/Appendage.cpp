@@ -22,6 +22,7 @@ Appendage::Appendage() : Subsystem("Appendage") {
 	Ramp2 = new DoubleSolenoid(PCM, Ramp2Port1, Ramp2Port2);
 	Boxlightgate = new DigitalInput(BoxlightgateDIO);
 	ElevatorEncoder = new Encoder(ElevatorEncoder1, ElevatorEncoder2, false, Encoder::k4X);
+	Ultrasonic = new AnalogInput(UltrasonicPort);
 
 
 }
@@ -143,5 +144,22 @@ void Appendage::ElevPID(double POS){
 				Elevator2->Set(Kp*Encodererror);
 				Brake->Set(DoubleSolenoid::Value::kReverse);
 			}
+
+}
+
+void Appendage::GetDistanceUltrasonic(){
+	double val = Ultrasonic->GetVoltage(); //Get distance form range finder
+	double distval = 8.8342*val+0.279; //Converting "val" from volts to feet
+	frc::SmartDashboard::PutString("DB/String 9", to_string(distval)); //Sends "distval" to the dashboard
+
+	double EncoderDistance = ElevatorEncoder->GetDistance();
+	double UltrasonicEncoder = EncoderDistance-distval; //Reads the height of the object in the view of the ultrasonic sensor
+	if (UltrasonicEncoder > 1){
+		bool ObjectDetected = true; //if the object is more then a foot tall, then [true]
+	}
+	else{
+		bool ObjectDetected = false; //if not, then [false]
+	}
+
 
 }

@@ -29,6 +29,8 @@ DigitalInput * Boxlightgate;
 
 Encoder * ElevatorEncoder;
 
+AnalogInput * Ultrasonic;
+
 
 
 
@@ -40,6 +42,8 @@ Appendage();
 	void Elevator(double Joystick, bool a, bool b, bool x, bool y);
 	void Ramp(bool Button1);
 	void LightGateGet();
+	void GetDistanceUltrasonic();
+
 
 };
 

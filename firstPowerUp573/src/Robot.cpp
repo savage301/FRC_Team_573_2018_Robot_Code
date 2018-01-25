@@ -15,6 +15,7 @@
 #include <Joystick.h>
 #include <Subsystems/Drive.h>
 #include <Subsystems/Appendage.h>
+#include <Subsystems/Autonomous.h>
 #include "Commands/ExampleCommand.h"
 #include "Commands/MyAutoCommand.h"
 #include "RobotMap.h"
@@ -31,6 +32,8 @@ public:
 	Appendage MyAppendage;
 	Log myLog;
 	frc::PowerDistributionPanel board;
+	Autonomous myAuto;
+
 
 
 
@@ -90,6 +93,9 @@ public:
 		if (m_autonomousCommand != nullptr) {
 			m_autonomousCommand->Start();
 		}
+
+		myAuto.ModeSelect();
+
 	}
 
 	void AutonomousPeriodic() override {
@@ -113,6 +119,7 @@ public:
 	void TeleopPeriodic() override {
 
 		frc::Scheduler::GetInstance()->Run();
+		MyAppendage.GetDistanceUltrasonic();
 
 // -------------------- Logging Code ---------------------------------------------/
 		//myLog.Write("Test Output");
@@ -128,6 +135,8 @@ public:
 		bool AButton = controller1.GetRawButton(1);
 		bool BButton = controller1.GetRawButton(2);
 		bool XButton = controller1.GetRawButton(3);
+		bool YButton = controller1.GetRawButton(4);
+		bool LBButton = controller1.GetRawButton(5);
 
 // ------------------------------------------------------------------------------------------
 // ------------Camera Aided Driving ----------------------
@@ -140,6 +149,10 @@ public:
 
 			MyDrive.GyroSetpoint(90);
 
+		} else if(YButton) {
+
+			MyDrive.EncoderSetpoint(108);
+
 		} else {
 
 			MyDrive.TankDrive(leftin,rightin); //Pass to Tank Drive Function
@@ -150,7 +163,8 @@ public:
 		if(XButton)
 			MyDrive.GyroReset();
 
-//--------------Gyro Setpoint Driving-----------------------
+		if(LBButton)
+			MyDrive.EncoderReset();
 
 
 
@@ -221,6 +235,9 @@ public:
 		else {
 			MyAppendage.Claw(0);
 		}
+
+// Random Logging code???
+		myLog.PDP(1, 5, true);
 
 
 
