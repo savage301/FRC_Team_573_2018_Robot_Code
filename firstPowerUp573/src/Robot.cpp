@@ -117,6 +117,7 @@ public:
 	void TeleopPeriodic() override {
 
 		frc::Scheduler::GetInstance()->Run();
+		MyAppendage.GetDistanceUltrasonic();
 
 // --------------- Basic Driving --------------------------------------
 
