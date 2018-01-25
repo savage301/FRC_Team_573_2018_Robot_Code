@@ -11,9 +11,9 @@ Appendage::Appendage() : Subsystem("Appendage") {
 
 	// Setup Motor Controllers
 	ClawMotorLeft1 = new Talon(ClawMotorLeft1PWM);
-	ClawMotorLeft2 = new Talon(ClawMotorLeft2PWM);
+
 	ClawMotorRight1 = new Talon(ClawMotorRight1PWM);
-	ClawMotorRight2 = new Talon(ClawMotorRight2PWM);
+
 
 	Elevator1 = new Talon(ElevatorPWM);
 	Elevator2 = new Talon(ElevatorPWM);
@@ -34,26 +34,36 @@ void Appendage::InitDefaultCommand() {
 // Put methods for controlling this subsystem
 // here. Call these from Commands.
 
+void Appendage::LightGateGet(){
+	bool lightgatebool = not(Boxlightgate->Get());
+
+	auto Gyrooutstr = std::to_string(lightgatebool);
+	frc::SmartDashboard::PutString("DB/String 6",Gyrooutstr);
+
+	frc::SmartDashboard::PutBoolean("Box in Robot", lightgatebool);
+}
+
+
 void Appendage::Claw(double speed) {
 
 
 	if (speed <= 0){
 		ClawMotorLeft1->Set(speed); //Set left value to talon
-		ClawMotorLeft2->Set(speed); //Set left value to talon
+
 		ClawMotorRight1->Set(speed); //Set left value to talon
-		ClawMotorRight2->Set(speed); //Set left value to talon
+
 	}
 	else if (speed > 0 and Boxlightgate->Get()){
 		ClawMotorLeft1->Set(speed); //Set left value to talon
-		ClawMotorLeft2->Set(speed); //Set left value to talon
+
 		ClawMotorRight1->Set(speed); //Set left value to talon
-		ClawMotorRight2->Set(speed); //Set left value to talon
+
 	}
 	else {
 		ClawMotorLeft1->Set(0); //Set left value to talon
-		ClawMotorLeft2->Set(0); //Set left value to talon
+
 		ClawMotorRight1->Set(0); //Set left value to talon
-		ClawMotorRight2->Set(0); //Set left value to talon
+
 	}
 
 
