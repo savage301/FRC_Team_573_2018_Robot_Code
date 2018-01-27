@@ -10,6 +10,7 @@
 #include <sstream>
 #include <PowerDistributionPanel.h>
 
+
 using namespace std;
 
 ofstream outText;
@@ -44,7 +45,7 @@ string Log::dateAndTime() {
 	string minuteS = to_string(minute);
 	int second = now->tm_sec;
 	string secondS = to_string(second);
-
+  
 	string currentTimeDate = monthS + "." + dayS + "." + yearS + "___" + hourS + "." + minuteS + "." + secondS;
 
 	return currentTimeDate;
@@ -96,7 +97,9 @@ void Log::PDPTotal(){
 	double val = board.GetTotalCurrent();
 	bool light;
 
-	if (val > 1){
+
+	if (val > 400){
+
 		counter = counter + 1;
 		if (counter > 50){
 			light = true;
@@ -128,6 +131,42 @@ void Log::DrivetrainCurrentCompare(int slot,double PWMin){
 	}
 }
 
+void Log::ProgrammingTabInfoLog(){
+
+	double val;
+
+	val = board.GetCurrent(0);
+	frc::SmartDashboard::PutString("Left Cim 1", to_string(val));
+
+	val = board.GetCurrent(1);
+	frc::SmartDashboard::PutString("Left Cim 2", to_string(val));
+
+	 val = board.GetCurrent(2);
+	frc::SmartDashboard::PutString("Left Cim 3", to_string(val));
+
+	 val = board.GetCurrent(13);
+	frc::SmartDashboard::PutString("Right Cim 1", to_string(val));
+
+	 val = board.GetCurrent(14);
+	frc::SmartDashboard::PutString("Right Cim 2", to_string(val));
+
+	val = board.GetCurrent(15);
+	frc::SmartDashboard::PutString("Right Cim 3", to_string(val));
+	//frc::SmartDashboard::PutString("DB/String 4",to_string(board.GetCurrent(15)));
+
+	val = board.GetCurrent(3);
+	frc::SmartDashboard::PutString("Elevator 1", to_string(val));
+
+	 val = board.GetCurrent(12);
+	frc::SmartDashboard::PutString("Elevator 2", to_string(val));
+
+	 val = board.GetCurrent(10);
+	frc::SmartDashboard::PutString("Claw 1", to_string(val));
+
+	 val = board.GetCurrent(11);
+	frc::SmartDashboard::PutString("Claw 2", to_string(val));
+
+}
 void Log::Close() {
 
 	outText.close();

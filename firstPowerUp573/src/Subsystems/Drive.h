@@ -14,10 +14,11 @@ private:
 	// for methods that implement subsystem capabilities
 Talon * LeftDrive;
 Talon * RightDrive;
-RobotDrive * MyRobotDrive;
+//RobotDrive * MyRobotDrive;
 ADXRS450_Gyro * MyGyro;
 Encoder * LeftDriveEncoder;
 Encoder * RightDriveEncoder;
+
 
 public:
 	Drive();
@@ -28,6 +29,8 @@ public:
 	void GyroReset();
 	void EncoderSetpoint(double setpoint);
 	void EncoderReset();
+	void ProgrammingTabInfoDrive();
+
 };
 
 #endif  // Drive_H

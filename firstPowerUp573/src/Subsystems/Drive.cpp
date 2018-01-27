@@ -17,7 +17,8 @@ Drive::Drive() : Subsystem("Drive") {
 	RightDrive = new Talon(RightDrivePWM);
 	MyGyro = new ADXRS450_Gyro();
 	LeftDriveEncoder = new Encoder(0, 1, false, Encoder::k4X);
-	//RightDriveEncoder = new Encoder(2, 3, false, Encoder::k4x);
+	RightDriveEncoder = new Encoder(2, 3, false, Encoder::k4X);
+
 
 }
 
@@ -188,7 +189,8 @@ void Drive::EncoderSetpoint(double setpoint) {
 void Drive::EncoderReset() {
 
 	LeftDriveEncoder->Reset();
-	//RightDriveEncoder>Reset();
+	RightDriveEncoder>Reset();
+
 
 }
 
@@ -198,3 +200,28 @@ void Drive::GyroReset() {
 
 }
 
+void Drive::ProgrammingTabInfoDrive(){
+	//Must move inside a function in Drive.cpp
+	double gyroval = MyGyro->GetAngle();
+	frc::SmartDashboard::PutString("Gyro", to_string(gyroval));
+
+	double leftenc = LeftDriveEncoder->Get();
+	frc::SmartDashboard::PutString("Drive Encoder Left", to_string(leftenc));
+
+	double rightenc = RightDriveEncoder->Get();
+	frc::SmartDashboard::PutString("Drive Encoder Right", to_string(rightenc));
+
+	std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
+	float targetOffsetAngle_Horizontal = table->GetNumber("tx",0);
+	float targetOffsetAngle_Vertical = table->GetNumber("ty",0);
+	float targetArea = table->GetNumber("ta",0);
+	float targetSkew = table->GetNumber("ts",0);
+	float targetExists = table->GetNumber("tv",0);
+
+	frc::SmartDashboard::PutNumber("tx Cam", targetOffsetAngle_Horizontal);
+	frc::SmartDashboard::PutNumber("ty Cam", targetOffsetAngle_Vertical);
+	frc::SmartDashboard::PutNumber("ta Cam", targetArea);
+	frc::SmartDashboard::PutNumber("ts Cam", targetSkew);
+	frc::SmartDashboard::PutNumber("tv Cam", targetExists);
+
+}

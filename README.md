@@ -32,7 +32,7 @@ The WPILib C++ API help can be found here. http://first.wpi.edu/FRC/roborio/rele
 
 ------- LimeLight ---------
 
-We have ordered a LimeLight camera for use this season. It should arrive week 1 of build. There website is https://limelightvision.io/ and there documentation can be found at http://docs.limelightvision.io/en/latest/
+We used LimeLight camera for vision. The website is https://limelightvision.io/ and there documentation can be found at http://docs.limelightvision.io/en/latest/
 
 ------ Code Structure ---------
 
@@ -42,7 +42,7 @@ Created the following subsystem code files containing fucntions to be called in 
  -Drive.cpp
  -Appendage.cpp
  -Log.cpp
- -Auto.cpp
+ -Autonomous.cpp
 
 ------- Anything Else --------
 
@@ -56,12 +56,12 @@ If you have any questions please contact Coach Eric.
 
 Combined Kevan and Chase branches on 1/19 into master, then recreated the branches.
 
+Combined Kevan1 and Chase1 branches on 1/26 into master, then recreated the branches. Also included labview driver station in this commit.
+
 ------- Kevan's To-Do's ---------
 
- ~ Date and time for logging
-
- ~ Turning off camera lights in RobotInit
+~ Scouting App
  
  ------ Chase To- Do's ---------
  
- ~ Have compressor auto turn off when drive wheels get 70% + PWM signal.
+ ~ Have compressor auto turn off when drive wheels get 70% + PWM signal. (If we use a compressor on the robot)

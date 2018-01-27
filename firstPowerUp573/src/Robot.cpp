@@ -26,25 +26,24 @@
 class Robot : public frc::TimedRobot {
 public:
 
-	frc::Joystick controller1{ Driver1 };  // only joystick
-	frc::Joystick controller2{ Driver2 };  // only joystick
-	Drive MyDrive;
-	Appendage MyAppendage;
-	Log myLog;
+
+	frc::Joystick controller1{ Driver1 };  // Xbox controller 1
+	frc::Joystick controller2{ Driver2 };  // Xbox controller 2
+	Drive MyDrive; 			//Calling Drive.h
+	Appendage MyAppendage; 	//Calling Appendage.h
+	Log myLog; 				//Calling Log.h
+	Autonomous myAuto; //Calling Autonomus.h
+
 	frc::PowerDistributionPanel board;
-	Autonomous myAuto;
-
-
-
 
 	void RobotInit() override {
 		m_chooser.AddDefault("Default Auto", &m_defaultAuto);
 		m_chooser.AddObject("My Auto", &m_myAuto);
 		frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
-		//std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
-
-		//table->PutNumber("ledMode",1);
+		//Turning off Limelight LEDs upon robot init
+		std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
+		table->PutNumber("ledMode",1);
 
 	}
 
@@ -63,6 +62,10 @@ public:
 
 	void DisabledPeriodic() override {
 		frc::Scheduler::GetInstance()->Run();
+
+		//Turning off Limelight LEDs when robot is disabled
+		std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
+		table->PutNumber("ledMode",1);
 	}
 
 	/**
@@ -112,7 +115,7 @@ public:
 			m_autonomousCommand = nullptr;
 		}
 
-		myLog.Create();
+		myLog.Create(); //Start New Log File
 
 	}
 
@@ -128,7 +131,16 @@ public:
 
 // ---------------------------------------------------------------------------
 
-// --------------- Basic Driving --------------------------------------
+
+
+// -------------------- Logging Code ---------------------------------------------/
+		//Place code to write current setitings to log file
+		//myLog.Write("Test Output");
+		//myLog.PDP(15, 5, false);
+
+// ---------------------------------------------------------------------------
+
+// --------------- Driving --------------------------------------
 
 		double leftin = pow(controller1.GetRawAxis(1), 3); //Get Drive Left Joystick Y Axis Value
 		double rightin = pow(controller1.GetRawAxis(5), 3); //Get Drive right Joystick Y Axis Value
@@ -138,16 +150,19 @@ public:
 		bool YButton = controller1.GetRawButton(4);
 		bool LBButton = controller1.GetRawButton(5);
 
-// ------------------------------------------------------------------------------------------
-// ------------Camera Aided Driving ----------------------
+
 
 		if(AButton) {
-
+		// ------------Camera Aided Driving ----------------------
 			MyDrive.CameraCenter(leftin);
 
 		} else if(BButton) {
 
-			MyDrive.GyroSetpoint(90);
+			MyDrive.GyroSetpoint(90); // Gryo setpoint test TO BE REMOVED
+
+		} else if(YButton) {
+
+			MyDrive.EncoderSetpoint(108); // Encoder setpoint test TO BE REMOVED
 
 		} else if(YButton) {
 
@@ -161,19 +176,17 @@ public:
 
 
 		if(XButton)
-			MyDrive.GyroReset();
+			MyDrive.GyroReset(); //Gyro reset TO BE REMOVED
 
 		if(LBButton)
-			MyDrive.EncoderReset();
-
-
+			MyDrive.EncoderReset(); //Encoder rest TO BE REMOVED
 
 
 // ------------- Dashboard Indicator Code ---------------------------------
-	//Total Current
+	//Total Current : Flags if total current exceed 400 amps for more than 1 sec to dashboard
 		myLog.PDPTotal();
 
-	//Box in Vision
+	//Box in Vision : Checks to see if box is aquired by vision system
 		std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
 		table->PutNumber("ledMode",1);
 		table->PutNumber("pipeline",4);
@@ -189,11 +202,10 @@ public:
 
 		frc::SmartDashboard::PutBoolean("Cube in Camview", cubeBool);
 
-	//Box in Claw
+	//Box in Claw : Checks if light gate is open or closed
 		MyAppendage.LightGateGet();
 
-	//Current Mismatch
-
+	//Current Mismatch : Checks to see if drive motor have a large current mismatch and prints to dashboard
 		myLog.DrivetrainCurrentCompare(0,leftin);
 		myLog.DrivetrainCurrentCompare(1,leftin);
 		myLog.DrivetrainCurrentCompare(2,leftin);
@@ -201,16 +213,22 @@ public:
 		myLog.DrivetrainCurrentCompare(14,rightin);
 		myLog.DrivetrainCurrentCompare(15,rightin);
 
+	//Over Plates Check
+		MyAppendage.GetDistanceUltrasonic(); // Check to see if over plates:Set indicator on dashboard
 
-		//
+
+	//Programming Tab Info
+		myLog.ProgrammingTabInfoLog();
+		MyDrive.ProgrammingTabInfoDrive();
+		MyAppendage.ProgrammingTabInfoAppendage();
 
 // ----------------------------Claw Control----------------------------
-		double clawinraw = controller2.GetRawAxis(2);
-		double clawoutraw = controller2.GetRawAxis(3);
+		double clawinraw = controller2.GetRawAxis(2); //Claw in
+		double clawoutraw = controller2.GetRawAxis(3); //Claw out
 		bool clawinbtn;
 		bool clawoutbtn;
 
-		//Taking the raw value and making it a boolean
+		//Taking the claw in or out raw value and making it a boolean
 		if (clawinraw > .75){
 			clawinbtn = 1;
 		}
@@ -225,21 +243,22 @@ public:
 			clawoutbtn = 0;
 		}
 
-		//Setting talons
+		//Setting claw talons power settings
 		if (clawinbtn){
-			MyAppendage.Claw(.8);
+			MyAppendage.Claw(.8); //Claw in
 		}
 		else if (clawoutbtn){
-			MyAppendage.Claw(-.8);
+			MyAppendage.Claw(-.8); // Claw out
 		}
 		else {
-			MyAppendage.Claw(0);
+			MyAppendage.Claw(0); //Claw stop
 		}
 
 // Random Logging code???
-		myLog.PDP(1, 5, true);
+		//myLog.PDP(1, 5, true);
 
 
+//--------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------
 
@@ -250,11 +269,13 @@ public:
 		bool elevatorpos2 = controller2.GetRawButton(3);
 		bool elevatorpos3 = controller2.GetRawButton(4);
 
+		//Call elevator function
 		MyAppendage.Elevator(elevatorraw, elevatorground, elevatorpos1, elevatorpos2, elevatorpos3);
 
 //------------------------------------------------------------------------------------
 
 //---------------------------Ramps-----------------------------
+	//Ramps down with Lbumper and Rbumper ramps back up with right joystick press
 	bool rampbutton1 = controller2.GetRawButton(5);
 	bool rampbutton2 = controller2.GetRawButton(6);
 	bool rampbutton3 = controller2.GetRawButton(10);
