@@ -15,6 +15,9 @@ private:
 Talon * LeftDrive;
 Talon * RightDrive;
 //RobotDrive * MyRobotDrive;
+ADXRS450_Gyro * MyGyro;
+Encoder * LeftDriveEncoder;
+Encoder * RightDriveEncoder;
 
 
 
@@ -27,9 +30,8 @@ public:
 	void GyroReset();
 	void EncoderSetpoint(double setpoint);
 	void EncoderReset();
-	ADXRS450_Gyro * MyGyro;
-	Encoder * LeftDriveEncoder;
-	Encoder * RightDriveEncoder;
+	void ProgrammingTabInfoDrive();
+
 
 };
 

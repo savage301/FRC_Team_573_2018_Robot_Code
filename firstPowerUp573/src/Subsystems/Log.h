@@ -22,7 +22,7 @@ public:
 	void PDPTotal();
 	void Close();
 	void DrivetrainCurrentCompare(int slot,double PWMin);
-	void ProgrammingTabInfo();
+	void ProgrammingTabInfoLog();
 };
 
 

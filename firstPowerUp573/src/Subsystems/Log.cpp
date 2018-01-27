@@ -15,7 +15,6 @@ using namespace std;
 
 ofstream outText;
 frc::PowerDistributionPanel board;
-//Drive MyDriveLog;
 int counter;
 
 Log::Log() : Subsystem("Drive") {
@@ -98,7 +97,7 @@ void Log::PDPTotal(){
 	double val = board.GetTotalCurrent();
 	bool light;
 
-	if (val > 1){
+	if (val > 400){
 		counter = counter + 1;
 		if (counter > 50){
 			light = true;
@@ -130,7 +129,7 @@ void Log::DrivetrainCurrentCompare(int slot,double PWMin){
 	}
 }
 
-void Log::ProgrammingTabInfo(){
+void Log::ProgrammingTabInfoLog(){
 
 	double val;
 
@@ -164,21 +163,6 @@ void Log::ProgrammingTabInfo(){
 
 	 val = board.GetCurrent(11);
 	frc::SmartDashboard::PutString("Claw 2", to_string(val));
-
-
-	//Must move inside a function in Drive.cpp
-	/*double gyroval = MyDrive.MyGyro->GetAngle();
-	frc::SmartDashboard::PutString("Gyro", to_string(gyroval));
-
-	double leftenc = MyDrive.LeftDriveEncoder->Get();
-	frc::SmartDashboard::PutString("Drive Encoder Left", to_string(leftenc));
-
-	double rightenc = MyDrive.RightDriveEncoder->Get();
-	frc::SmartDashboard::PutString("Drive Encoder Right", to_string(rightenc));
-*/
-
-
-
 
 }
 void Log::Close() {

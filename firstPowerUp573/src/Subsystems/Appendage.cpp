@@ -147,7 +147,7 @@ void Appendage::ElevPID(double POS){
 
 }
 
-void Appendage::GetDistanceUltrasonic(){
+double Appendage::GetDistanceUltrasonic(){
 	double val = Ultrasonic->GetVoltage(); //Get distance form range finder
 	double distval = 8.8342*val+0.279; //Converting "val" from volts to feet
 	frc::SmartDashboard::PutString("DB/String 9", to_string(distval)); //Sends "distval" to the dashboard
@@ -163,5 +163,17 @@ void Appendage::GetDistanceUltrasonic(){
 		ObjectDetected = false; //if not, then [false]
 	}
 
+ return distval;
+}
+
+
+void Appendage::ProgrammingTabInfoAppendage(){
+
+	double val;
+	val = GetDistanceUltrasonic();
+	frc::SmartDashboard::PutString("Raw Distance Sensor", to_string(val));
+
+	val = ElevatorEncoder->GetDistance();
+	frc::SmartDashboard::PutString("Lift Encoder", to_string(val));
 
 }
