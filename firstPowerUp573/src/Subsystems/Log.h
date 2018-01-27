@@ -14,12 +14,16 @@ private:
 
 public:
 	Log();
-	//string dateAndTime();
+	string dateAndTime();
 	void Create();
 	string RandomNum();
 	void PDP(int slot, double limit, bool override);
 	void Write(string text);
+	void PDPTotal();
 	void Close();
+	void DrivetrainCurrentCompare(int slot,double PWMin);
+	void ProgrammingTabInfo();
 };
+
 
 #endif  // Drive_H

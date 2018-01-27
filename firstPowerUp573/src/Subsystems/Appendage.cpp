@@ -11,9 +11,9 @@ Appendage::Appendage() : Subsystem("Appendage") {
 
 	// Setup Motor Controllers
 	ClawMotorLeft1 = new Talon(ClawMotorLeft1PWM);
-	ClawMotorLeft2 = new Talon(ClawMotorLeft2PWM);
+
 	ClawMotorRight1 = new Talon(ClawMotorRight1PWM);
-	ClawMotorRight2 = new Talon(ClawMotorRight2PWM);
+
 
 	Elevator1 = new Talon(ElevatorPWM);
 	Elevator2 = new Talon(ElevatorPWM);
@@ -22,6 +22,7 @@ Appendage::Appendage() : Subsystem("Appendage") {
 	Ramp2 = new DoubleSolenoid(PCM, Ramp2Port1, Ramp2Port2);
 	Boxlightgate = new DigitalInput(BoxlightgateDIO);
 	ElevatorEncoder = new Encoder(ElevatorEncoder1, ElevatorEncoder2, false, Encoder::k4X);
+	Ultrasonic = new AnalogInput(UltrasonicPort);
 
 
 }
@@ -34,26 +35,36 @@ void Appendage::InitDefaultCommand() {
 // Put methods for controlling this subsystem
 // here. Call these from Commands.
 
+void Appendage::LightGateGet(){
+	bool lightgatebool = not(Boxlightgate->Get());
+
+	auto Gyrooutstr = std::to_string(lightgatebool);
+	frc::SmartDashboard::PutString("DB/String 6",Gyrooutstr);
+
+	frc::SmartDashboard::PutBoolean("Box in Robot", lightgatebool);
+}
+
+
 void Appendage::Claw(double speed) {
 
 
 	if (speed <= 0){
 		ClawMotorLeft1->Set(speed); //Set left value to talon
-		ClawMotorLeft2->Set(speed); //Set left value to talon
+
 		ClawMotorRight1->Set(speed); //Set left value to talon
-		ClawMotorRight2->Set(speed); //Set left value to talon
+
 	}
 	else if (speed > 0 and Boxlightgate->Get()){
 		ClawMotorLeft1->Set(speed); //Set left value to talon
-		ClawMotorLeft2->Set(speed); //Set left value to talon
+
 		ClawMotorRight1->Set(speed); //Set left value to talon
-		ClawMotorRight2->Set(speed); //Set left value to talon
+
 	}
 	else {
 		ClawMotorLeft1->Set(0); //Set left value to talon
-		ClawMotorLeft2->Set(0); //Set left value to talon
+
 		ClawMotorRight1->Set(0); //Set left value to talon
-		ClawMotorRight2->Set(0); //Set left value to talon
+
 	}
 
 
@@ -133,5 +144,24 @@ void Appendage::ElevPID(double POS){
 				Elevator2->Set(Kp*Encodererror);
 				Brake->Set(DoubleSolenoid::Value::kReverse);
 			}
+
+}
+
+void Appendage::GetDistanceUltrasonic(){
+	double val = Ultrasonic->GetVoltage(); //Get distance form range finder
+	double distval = 8.8342*val+0.279; //Converting "val" from volts to feet
+	frc::SmartDashboard::PutString("DB/String 9", to_string(distval)); //Sends "distval" to the dashboard
+
+	double EncoderDistance = ElevatorEncoder->GetDistance();
+	double UltrasonicEncoder = EncoderDistance-distval; //Reads the height of the object in the view of the ultrasonic sensor
+
+	bool ObjectDetected;
+	if (UltrasonicEncoder > 1){
+		ObjectDetected = true; //if the object is more then a foot tall, then [true]
+	}
+	else{
+		ObjectDetected = false; //if not, then [false]
+	}
+
 
 }

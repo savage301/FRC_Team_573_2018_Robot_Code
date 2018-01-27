@@ -5,22 +5,53 @@
 #include <fstream>
 #include <ctime>
 #include <time.h>
+#include <chrono>
+#include <iostream>
+#include <sstream>
 #include <PowerDistributionPanel.h>
+
 
 using namespace std;
 
 ofstream outText;
 frc::PowerDistributionPanel board;
+//Drive MyDriveLog;
+int counter;
 
 Log::Log() : Subsystem("Drive") {
 
 }
 
-//string Log::dateAndTime() {
+string Log::dateAndTime() {
 
+	/*time_t curTime = time(nullptr);
+	string timeOut = asctime(localtime(&curTime));
 
+	//return timeOut;
 
-//}
+	return "test value";*/
+
+	time_t t = time(0);
+	struct tm * now = localtime(&t);
+
+	int year = now->tm_year + 1900;
+	string yearS = to_string(year);
+	int month = now->tm_mon + 1;
+	string monthS = to_string(month);
+	int day = now->tm_mday;
+	string dayS = to_string(day);
+	int hour = now->tm_hour;
+	string hourS = to_string(hour);
+	int minute = now->tm_min;
+	string minuteS = to_string(minute);
+	int second = now->tm_sec;
+	string secondS = to_string(second);
+
+	string currentTimeDate = monthS + "." + dayS + "." + yearS + "___" + hourS + "." + minuteS + "." + secondS;
+
+	return currentTimeDate;
+
+}
 
 string Log::RandomNum() {
 
@@ -37,7 +68,7 @@ void Log::Create() {
 	//MUST PUT USB IN PORT ON INSIDE OF ROBORIO
 
 	//late incorporate time and date and USB file path
-	string filepath = "/u/" + RandomNum() + ".csv";
+	string filepath = "/u/" + dateAndTime() + ".txt";
 	outText.open(filepath);
 	//outText.open("/u/test.txt");
 
@@ -55,15 +86,101 @@ void Log::PDP(int slot, double limit, bool override) {
 	double val = board.GetCurrent(slot);
 
 	if(val > limit || override){
-	string output = /*dateAndTime() + "," + */to_string(slot) + "," + to_string(limit) + "," + to_string(val) + "," + to_string(override);
-
+	string output = dateAndTime() + "," + to_string(slot) + "," + to_string(limit) + "," + to_string(val) + "," + to_string(override);
 
 	Write(output);
-	}
+}
 
 
 }
 
+void Log::PDPTotal(){
+	double val = board.GetTotalCurrent();
+	bool light;
+
+	if (val > 1){
+		counter = counter + 1;
+		if (counter > 50){
+			light = true;
+		}
+		else{
+			light = false;
+		}
+	}
+	else {
+		counter = 0;
+		light = false;
+	}
+
+	frc::SmartDashboard::PutBoolean("!! OVER 400 AMPS !!", light);
+	auto Gyrooutstr = std::to_string(counter);
+	frc::SmartDashboard::PutString("DB/String 5",Gyrooutstr);
+}
+
+void Log::DrivetrainCurrentCompare(int slot,double PWMin){
+
+	double current = board.GetCurrent(slot);
+
+	if (abs(PWMin) > .2){
+		if (abs(current) < 1){
+			string output = "!----PDP Slot" + to_string(slot) + "is not getting enough current when driven";
+			Write(output);
+			frc::SmartDashboard::PutString("Slot Not Getting Current",to_string(slot));
+		}
+	}
+}
+
+void Log::ProgrammingTabInfo(){
+
+	double val;
+
+	val = board.GetCurrent(0);
+	frc::SmartDashboard::PutString("Left Cim 1", to_string(val));
+
+	val = board.GetCurrent(1);
+	frc::SmartDashboard::PutString("Left Cim 2", to_string(val));
+
+	 val = board.GetCurrent(2);
+	frc::SmartDashboard::PutString("Left Cim 3", to_string(val));
+
+	 val = board.GetCurrent(13);
+	frc::SmartDashboard::PutString("Right Cim 1", to_string(val));
+
+	 val = board.GetCurrent(14);
+	frc::SmartDashboard::PutString("Right Cim 2", to_string(val));
+
+	val = board.GetCurrent(15);
+	frc::SmartDashboard::PutString("Right Cim 3", to_string(val));
+	//frc::SmartDashboard::PutString("DB/String 4",to_string(board.GetCurrent(15)));
+
+	val = board.GetCurrent(3);
+	frc::SmartDashboard::PutString("Elevator 1", to_string(val));
+
+	 val = board.GetCurrent(12);
+	frc::SmartDashboard::PutString("Elevator 2", to_string(val));
+
+	 val = board.GetCurrent(10);
+	frc::SmartDashboard::PutString("Claw 1", to_string(val));
+
+	 val = board.GetCurrent(11);
+	frc::SmartDashboard::PutString("Claw 2", to_string(val));
+
+
+	//Must move inside a function in Drive.cpp
+	/*double gyroval = MyDrive.MyGyro->GetAngle();
+	frc::SmartDashboard::PutString("Gyro", to_string(gyroval));
+
+	double leftenc = MyDrive.LeftDriveEncoder->Get();
+	frc::SmartDashboard::PutString("Drive Encoder Left", to_string(leftenc));
+
+	double rightenc = MyDrive.RightDriveEncoder->Get();
+	frc::SmartDashboard::PutString("Drive Encoder Right", to_string(rightenc));
+*/
+
+
+
+
+}
 void Log::Close() {
 
 	outText.close();
