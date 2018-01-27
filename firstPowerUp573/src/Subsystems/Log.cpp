@@ -45,7 +45,7 @@ string Log::dateAndTime() {
 	string minuteS = to_string(minute);
 	int second = now->tm_sec;
 	string secondS = to_string(second);
-
+  
 	string currentTimeDate = monthS + "." + dayS + "." + yearS + "___" + hourS + "." + minuteS + "." + secondS;
 
 	return currentTimeDate;
@@ -97,7 +97,9 @@ void Log::PDPTotal(){
 	double val = board.GetTotalCurrent();
 	bool light;
 
+
 	if (val > 400){
+
 		counter = counter + 1;
 		if (counter > 50){
 			light = true;

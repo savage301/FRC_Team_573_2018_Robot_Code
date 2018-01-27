@@ -20,7 +20,6 @@ Encoder * LeftDriveEncoder;
 Encoder * RightDriveEncoder;
 
 
-
 public:
 	Drive();
 	void InitDefaultCommand();
@@ -31,7 +30,6 @@ public:
 	void EncoderSetpoint(double setpoint);
 	void EncoderReset();
 	void ProgrammingTabInfoDrive();
-
 
 };
 

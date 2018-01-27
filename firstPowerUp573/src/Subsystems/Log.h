@@ -23,6 +23,7 @@ public:
 	void Close();
 	void DrivetrainCurrentCompare(int slot,double PWMin);
 	void ProgrammingTabInfoLog();
+
 };
 
 

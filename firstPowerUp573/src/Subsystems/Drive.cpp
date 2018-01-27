@@ -19,6 +19,7 @@ Drive::Drive() : Subsystem("Drive") {
 	LeftDriveEncoder = new Encoder(0, 1, false, Encoder::k4X);
 	RightDriveEncoder = new Encoder(2, 3, false, Encoder::k4X);
 
+
 }
 
 void Drive::InitDefaultCommand() {
@@ -144,7 +145,7 @@ void Drive::EncoderSetpoint(double setpoint) {
 	//Calculating distance covered by robot through encoder
 
 	double leftEncoderVal = LeftDriveEncoder->Get();
-	double rightEncoderVal = RightDriveEncoder->Get();
+	//double rightEncoderVal = RightDriveEncoder->Get();
 
 	double leftDistance = leftEncoderVal * 2.17 / 40;
 	frc::SmartDashboard::PutString("DB/String 2", to_string(leftDistance));
@@ -189,6 +190,7 @@ void Drive::EncoderReset() {
 
 	LeftDriveEncoder->Reset();
 	RightDriveEncoder>Reset();
+
 
 }
 

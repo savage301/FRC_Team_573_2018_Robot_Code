@@ -26,6 +26,7 @@
 class Robot : public frc::TimedRobot {
 public:
 
+
 	frc::Joystick controller1{ Driver1 };  // Xbox controller 1
 	frc::Joystick controller2{ Driver2 };  // Xbox controller 2
 	Drive MyDrive; 			//Calling Drive.h
@@ -121,6 +122,14 @@ public:
 	void TeleopPeriodic() override {
 
 		frc::Scheduler::GetInstance()->Run();
+		MyAppendage.GetDistanceUltrasonic();
+
+// -------------------- Logging Code ---------------------------------------------/
+		//myLog.Write("Test Output");
+		//myLog.PDP(15, 5, false);
+
+
+// ---------------------------------------------------------------------------
 
 
 
@@ -142,6 +151,7 @@ public:
 		bool LBButton = controller1.GetRawButton(5);
 
 
+
 		if(AButton) {
 		// ------------Camera Aided Driving ----------------------
 			MyDrive.CameraCenter(leftin);
@@ -153,6 +163,10 @@ public:
 		} else if(YButton) {
 
 			MyDrive.EncoderSetpoint(108); // Encoder setpoint test TO BE REMOVED
+
+		} else if(YButton) {
+
+			MyDrive.EncoderSetpoint(108);
 
 		} else {
 
@@ -166,6 +180,7 @@ public:
 
 		if(LBButton)
 			MyDrive.EncoderReset(); //Encoder rest TO BE REMOVED
+
 
 // ------------- Dashboard Indicator Code ---------------------------------
 	//Total Current : Flags if total current exceed 400 amps for more than 1 sec to dashboard
@@ -191,7 +206,6 @@ public:
 		MyAppendage.LightGateGet();
 
 	//Current Mismatch : Checks to see if drive motor have a large current mismatch and prints to dashboard
-
 		myLog.DrivetrainCurrentCompare(0,leftin);
 		myLog.DrivetrainCurrentCompare(1,leftin);
 		myLog.DrivetrainCurrentCompare(2,leftin);
@@ -241,9 +255,10 @@ public:
 		}
 
 // Random Logging code???
-		myLog.PDP(1, 5, true);
+		//myLog.PDP(1, 5, true);
 
 
+//--------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------
 
