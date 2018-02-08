@@ -19,7 +19,7 @@ Appendage::Appendage() : Subsystem("Appendage") {
 	Elevator2 = new Talon(ElevatorPWM);
 	Brake = new DoubleSolenoid(PCM, BrakePort1, BrakePort2);
 	Ramp1 = new DoubleSolenoid(PCM, Ramp1Port1, Ramp1Port2);
-	Ramp2 = new DoubleSolenoid(PCM, Ramp2Port1, Ramp2Port2);
+
 	Boxlightgate = new DigitalInput(BoxlightgateDIO);
 	ElevatorEncoder = new Encoder(ElevatorEncoder1, ElevatorEncoder2, false, Encoder::k4X);
 	Ultrasonic = new AnalogInput(UltrasonicPort);
@@ -35,13 +35,15 @@ void Appendage::InitDefaultCommand() {
 // Put methods for controlling this subsystem
 // here. Call these from Commands.
 
-void Appendage::LightGateGet(){
+bool Appendage::LightGateGet(){
 	bool lightgatebool = not(Boxlightgate->Get());
 
 	auto Gyrooutstr = std::to_string(lightgatebool);
 	frc::SmartDashboard::PutString("DB/String 6",Gyrooutstr);
 
 	frc::SmartDashboard::PutBoolean("Box in Robot", lightgatebool);
+
+	return lightgatebool;
 }
 
 
@@ -50,14 +52,14 @@ void Appendage::Claw(double speed) {
 
 	if (speed <= 0){
 		ClawMotorLeft1->Set(speed); //Set left value to talon
-
-		ClawMotorRight1->Set(speed); //Set left value to talon
+		double invspeed = (-1)*speed;
+		ClawMotorRight1->Set(invspeed); //Set left value to talon
 
 	}
 	else if (speed > 0 and Boxlightgate->Get()){
 		ClawMotorLeft1->Set(speed); //Set left value to talon
-
-		ClawMotorRight1->Set(speed); //Set left value to talon
+		double invspeed = (-1)*speed;
+		ClawMotorRight1->Set(invspeed); //Set left value to talon
 
 	}
 	else {
@@ -116,11 +118,11 @@ void Appendage::Elevator(double Joystick, bool a, bool b, bool x, bool y){
 void Appendage::Ramp(bool Button1){
 	if (Button1){
 		Ramp1->Set(DoubleSolenoid::Value::kForward);
-		Ramp2->Set(DoubleSolenoid::Value::kForward);
+
 	}
 	else {
 		Ramp1->Set(DoubleSolenoid::Value::kReverse);
-		Ramp2->Set(DoubleSolenoid::Value::kReverse);
+
 	}
 }
 

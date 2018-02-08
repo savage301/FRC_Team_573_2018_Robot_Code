@@ -6,14 +6,21 @@
 /*----------------------------------------------------------------------------*/
 
 #include "MyAutoCommand.h"
+//#include "../Subsystems/Drive.h"
+//#include "../RobotMap.h"
 
 MyAutoCommand::MyAutoCommand() {
 	// Use Requires() here to declare subsystem dependencies
 	// eg. Requires(&Robot::chassis);
+		//Requires(Robot::MyDrive);
+
+
 }
 
 // Called just before this Command runs the first time
-void MyAutoCommand::Initialize() {}
+void MyAutoCommand::Initialize() {
+
+}
 
 // Called repeatedly when this Command is scheduled to run
 void MyAutoCommand::Execute() {}

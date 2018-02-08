@@ -23,7 +23,6 @@ Talon * Elevator2;
 DoubleSolenoid * Brake;
 
 DoubleSolenoid * Ramp1;
-DoubleSolenoid * Ramp2;
 
 DigitalInput * Boxlightgate;
 
@@ -41,7 +40,7 @@ Appendage();
 	void Claw(double speed);
 	void Elevator(double Joystick, bool a, bool b, bool x, bool y);
 	void Ramp(bool Button1);
-	void LightGateGet();
+	bool LightGateGet();
 	double GetDistanceUltrasonic();
 	void ProgrammingTabInfoAppendage();
 

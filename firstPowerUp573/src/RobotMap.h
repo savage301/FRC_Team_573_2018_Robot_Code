@@ -37,8 +37,8 @@ constexpr int BrakePort2 = 1;
 
 constexpr int Ramp1Port1 = 2;
 constexpr int Ramp1Port2 = 3;
-constexpr int Ramp2Port1 = 4;
-constexpr int Ramp2Port2 = 5;
+constexpr int ShifterPort1 = 4;
+constexpr int ShifterPort2 = 5;
 
 constexpr int BoxlightgateDIO = 6;
 

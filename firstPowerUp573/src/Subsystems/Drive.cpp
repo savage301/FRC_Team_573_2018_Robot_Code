@@ -17,7 +17,9 @@ Drive::Drive() : Subsystem("Drive") {
 	RightDrive = new Talon(RightDrivePWM);
 	MyGyro = new ADXRS450_Gyro();
 	LeftDriveEncoder = new Encoder(0, 1, false, Encoder::k4X);
-	RightDriveEncoder = new Encoder(2, 3, false, Encoder::k4X);
+	//RightDriveEncoder = new Encoder(2, 3, false, Encoder::k4X);
+	Shifter = new DoubleSolenoid(PCM, ShifterPort1, ShifterPort2);
+	LeftDrive->SetInverted(true);
 
 
 }
@@ -187,9 +189,9 @@ void Drive::EncoderSetpoint(double setpoint) {
 }
 
 void Drive::EncoderReset() {
-
-	LeftDriveEncoder->Reset();
-	RightDriveEncoder>Reset();
+ double blah;
+	//LeftDriveEncoder->Reset();
+	//RightDriveEncoder>Reset();
 
 
 }
@@ -208,8 +210,8 @@ void Drive::ProgrammingTabInfoDrive(){
 	double leftenc = LeftDriveEncoder->Get();
 	frc::SmartDashboard::PutString("Drive Encoder Left", to_string(leftenc));
 
-	double rightenc = RightDriveEncoder->Get();
-	frc::SmartDashboard::PutString("Drive Encoder Right", to_string(rightenc));
+	//double rightenc = RightDriveEncoder->Get();
+	//frc::SmartDashboard::PutString("Drive Encoder Right", to_string(rightenc));
 
 	std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
 	float targetOffsetAngle_Horizontal = table->GetNumber("tx",0);
@@ -224,4 +226,28 @@ void Drive::ProgrammingTabInfoDrive(){
 	frc::SmartDashboard::PutNumber("ts Cam", targetSkew);
 	frc::SmartDashboard::PutNumber("tv Cam", targetExists);
 
+	auto ShifterStatus = Shifter->Get();
+	bool ShiftStatusInd;
+
+	string ShiftStatusStr = to_string(ShifterStatus);
+	if (ShiftStatusStr == "2"){
+		ShiftStatusInd = true;
+	}
+	else{
+		ShiftStatusInd = false;
+	}
+	frc::SmartDashboard::PutString("DB/String 4",to_string(ShifterStatus));
+
+	frc::SmartDashboard::PutBoolean("High-gear (on) / Low-gear (off)",ShiftStatusInd);
+
 }
+
+void Drive::Booster(bool button){
+	if (button){
+		Shifter->Set(DoubleSolenoid::Value::kReverse);
+	}
+	else {
+		Shifter->Set(DoubleSolenoid::Value::kForward);
+	}
+}
+

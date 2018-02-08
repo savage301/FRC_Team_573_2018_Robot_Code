@@ -3,6 +3,7 @@
 
 #include <Commands/Subsystem.h>
 #include <WPILib.h>
+
 using namespace std;
 
 class Autonomous : public Subsystem {
@@ -15,6 +16,7 @@ private:
 public:
 	Autonomous();
 	int ModeSelect();
+	void CrossLine(int counter);
 
 };
 
