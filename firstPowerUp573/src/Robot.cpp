@@ -33,6 +33,8 @@ public:
 	Appendage MyAppendage; 	//Calling Appendage.h
 	Log myLog; 				//Calling Log.h
 	Autonomous myAuto; //Calling Autonomus.h
+	int count;
+	bool reset1;
 
 	frc::PowerDistributionPanel board;
 
@@ -97,12 +99,271 @@ public:
 			m_autonomousCommand->Start();
 		}
 
-		myAuto.ModeSelect();
+		//myAuto.ModeSelect();
+		count = 0;
+		reset1 = true;
+		MyDrive.GyroReset();
+		MyDrive.EncoderReset();
 
 	}
 
 	void AutonomousPeriodic() override {
 		frc::Scheduler::GetInstance()->Run();
+		double timesec = count * 20/1000;
+
+		string layout = DriverStation::GetInstance().GetGameSpecificMessage();
+
+		char switchclose = layout[0];
+		char scale = layout[1];
+		char switchfar = layout[2];
+		int leftorright = 0;
+		int leftorrightscale = 0;
+
+// ----- Setting Auto Selection Variables --------
+		if (switchclose == 'R'){
+			leftorright = 1;
+		}else{
+			leftorright = -1;
+		}
+		if (scale == 'R'){
+					leftorrightscale = 1;
+				}else{
+					leftorrightscale = -1;
+				}
+
+			// -1 left; 0:Middle; 1 Right
+		double startleftorrightdouble = frc::SmartDashboard::GetNumber("Start Location",0);
+
+		int startleftorright = (int) startleftorrightdouble;
+
+		double autoselectordouble = frc::SmartDashboard::GetNumber("Auto Selector",0);
+		int autoselector = (int) autoselectordouble;
+
+//Junk Code ------------------------------------------
+		/*if (timesec<2){
+		MyDrive.GyroSetpoint(90);
+			//MyDrive.TankDrive(1,1);
+		}
+		else if(timesec<4){
+			MyDrive.GyroSetpoint(0);
+		}
+		else{
+			MyDrive.TankDrive(0,0);
+		}*/
+
+		//
+
+		//MyDrive.EncoderSetpoint(feet);
+		//MyDrive.EncoderReset();
+		//MyDrive.GyroSetpoint(degrees);
+		//MyDrive.GyroReset();
+//----------------------------------------------------------------
+
+
+if (startleftorright == 0 && autoselector == 2){
+//--------Switch from center Automode (Assuming Right side pad) ---------------------
+		if (timesec<1){
+			MyDrive.EncoderSetpoint(1);
+		}
+		else if (timesec<2){
+			MyDrive.GyroSetpoint(90*leftorright);
+		}
+		else if (timesec<5){
+
+			if(reset1){
+				MyDrive.EncoderReset();
+				MyDrive.GyroReset();
+				reset1 = false;
+			}
+
+			MyDrive.EncoderSetpoint(3);
+		}
+		else if (timesec<6){
+			MyDrive.GyroSetpoint(-90*leftorright);
+			reset1 = true;
+		}
+		else if (timesec<9){
+
+			if(reset1){
+				MyDrive.EncoderReset();
+				MyDrive.GyroReset();
+				reset1 = false;
+			}
+			MyAppendage.Elevator(0, false,true,false,false);
+			MyDrive.TankDrive(0,0);
+
+		}
+		else if (timesec<10){
+
+			MyDrive.EncoderSetpoint(1);
+			MyAppendage.Elevator(0, false,false,false,false);
+		}
+		else if (timesec<11){
+			MyAppendage.Claw(-.8);
+			MyDrive.TankDrive(0,0);
+		}
+		else{
+			MyDrive.TankDrive(0,0);
+			MyAppendage.Claw(0);
+		}
+// ---------------------------------------------------------------
+}
+
+
+else if ((abs(startleftorright) == 1 && autoselector == 2 && leftorright == startleftorright)||(abs(startleftorright) == 1 && autoselector == 3 && leftorright == startleftorright && leftorrightscale != startleftorright)){
+// -------------- Side Start Switch (Assuming Right side pad)------------------------------
+		if (timesec<1){
+			MyDrive.EncoderSetpoint(1);
+		}
+		else if (timesec<2){
+			MyDrive.GyroSetpoint(-90*startleftorright);
+		}
+		else if (timesec<4){
+			if(reset1){
+				MyDrive.EncoderReset();
+				MyDrive.GyroReset();
+				reset1 = false;
+			}
+			MyAppendage.Elevator(0, false,true,false,false);
+			MyDrive.TankDrive(0,0);
+		}
+		else if (timesec<6){
+			MyDrive.EncoderSetpoint(2);
+			MyAppendage.Elevator(0, false,false,false,false);
+		}
+		else if (timesec<7){
+			MyAppendage.Claw(-.8);
+			MyDrive.TankDrive(0,0);
+		}
+		else{
+			MyDrive.TankDrive(0,0);
+			MyAppendage.Claw(0);
+		}
+
+// ---------------------------------------------------------------------------------------
+}
+
+
+else if (abs(startleftorright) == 1 && autoselector == 3 && leftorrightscale == startleftorright){
+// -------------- Side Start Scale (Assuming Right side pad)------------------------------
+		bool switchval;
+		if (leftorright == startleftorright){
+			switchval = false; //true is not on our side false is on our side
+		}else{
+			switchval = true;
+		}
+
+		if (timesec<5){
+			MyDrive.EncoderSetpoint(25);
+		}
+		else if (timesec<7){
+			if(reset1){
+				MyDrive.EncoderReset();
+				MyDrive.GyroReset();
+				reset1 = false;
+			}
+			MyAppendage.Elevator(0, false,false,false,true);
+			MyDrive.TankDrive(0,0);
+		}
+		else if (timesec<8){
+			MyDrive.EncoderSetpoint(1);
+			MyAppendage.Elevator(0, false,false,false,false);
+		}
+		else if (timesec<9){
+			MyAppendage.Claw(-.8);
+			MyDrive.TankDrive(0,0);
+			reset1 = true;
+		}
+		else if (timesec<10){
+			if(reset1){
+				MyDrive.EncoderReset();
+				MyDrive.GyroReset();
+				reset1 = false;
+			}
+			MyDrive.EncoderSetpoint(-1);
+			MyAppendage.Claw(0);
+		}
+		else if (timesec<12){
+			reset1 = true;
+			MyDrive.TankDrive(0,0);
+			MyAppendage.Elevator(0, true,false,false,false);
+		}
+		else if (timesec<13){
+
+			MyDrive.GyroSetpoint(-90*startleftorright);
+		}
+		else if (timesec<15){
+			if(reset1){
+				MyDrive.EncoderReset();
+				MyDrive.GyroReset();
+				reset1 = false;
+						}
+			MyDrive.EncoderSetpoint(2);
+		}
+		else if (timesec<16){
+
+			MyDrive.GyroSetpoint(-90*startleftorright);
+			reset1 = true;
+		}
+		else if (timesec<18){
+			bool boxinclaw = MyAppendage.LightGateGet();
+			if (boxinclaw){
+				MyDrive.TankDrive(0,0);
+			}
+			else{
+			MyDrive.CameraCenter(.5);
+			MyAppendage.Claw(.8);
+			}
+		}
+		else if (timesec<19){
+			if(reset1){
+				MyDrive.EncoderReset();
+				MyDrive.GyroReset();
+				reset1 = false;
+			}
+			MyDrive.EncoderSetpoint(-1);
+		}
+
+		//Skip rest if switch isn't ours
+		else if (timesec<21){
+			if(switchval){
+				count = 100000; //Messes with count to not place the cube on switch if its not infront of the right one.
+			}
+			MyAppendage.Elevator(0, false,true,false,false);
+			MyDrive.TankDrive(0,0);
+			reset1=true;
+		}
+		else if (timesec<22){
+			if(reset1){
+				MyDrive.EncoderReset();
+				MyDrive.GyroReset();
+				reset1 = false;
+						}
+			MyDrive.EncoderSetpoint(1);
+			MyAppendage.Elevator(0, false,false,false,false);
+		}
+		else if (timesec<23){
+			MyAppendage.Claw(-.8);
+			MyDrive.TankDrive(0,0);
+		}
+		else{
+			MyAppendage.Elevator(0, false,false,false,false);
+			MyDrive.TankDrive(0,0);
+			MyAppendage.Claw(0);
+		}
+
+
+// ---------------------------------------------------------------------------------------
+}
+else if ( autoselector == 0){
+	// Do nothing
+	MyDrive.TankDrive(0,0);
+}
+else{
+	//Drive forward
+	MyDrive.EncoderSetpoint(7);
+}
+		count = count + 1;
 	}
 
 	void TeleopInit() override {
@@ -116,6 +377,7 @@ public:
 		}
 
 		myLog.Create(); //Start New Log File
+
 
 	}
 
@@ -149,12 +411,20 @@ public:
 		bool XButton = controller1.GetRawButton(3);
 		bool YButton = controller1.GetRawButton(4);
 		bool LBButton = controller1.GetRawButton(5);
-
+		double RTrigger = controller1.GetRawAxis(3);
+		bool RTriggerButton;
+		if (abs (RTrigger) > .5){
+			RTriggerButton = true;
+		}
+		else {
+			RTriggerButton = false;
+		}
 
 
 		if(AButton) {
 		// ------------Camera Aided Driving ----------------------
 			MyDrive.CameraCenter(leftin);
+			MyDrive.Booster(false); //false is low-gear
 
 		} else if(BButton) {
 
@@ -170,7 +440,9 @@ public:
 
 		} else {
 
+
 			MyDrive.TankDrive(leftin,rightin); //Pass to Tank Drive Function
+			MyDrive.Booster(RTriggerButton);
 
 		}
 
@@ -208,10 +480,10 @@ public:
 	//Current Mismatch : Checks to see if drive motor have a large current mismatch and prints to dashboard
 		myLog.DrivetrainCurrentCompare(0,leftin);
 		myLog.DrivetrainCurrentCompare(1,leftin);
-		myLog.DrivetrainCurrentCompare(2,leftin);
+		//myLog.DrivetrainCurrentCompare(2,leftin);
 		myLog.DrivetrainCurrentCompare(13,rightin);
 		myLog.DrivetrainCurrentCompare(14,rightin);
-		myLog.DrivetrainCurrentCompare(15,rightin);
+		//myLog.DrivetrainCurrentCompare(15,rightin);
 
 	//Over Plates Check
 		MyAppendage.GetDistanceUltrasonic(); // Check to see if over plates:Set indicator on dashboard

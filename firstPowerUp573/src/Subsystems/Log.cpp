@@ -141,8 +141,8 @@ void Log::ProgrammingTabInfoLog(){
 	val = board.GetCurrent(1);
 	frc::SmartDashboard::PutString("Left Cim 2", to_string(val));
 
-	 val = board.GetCurrent(2);
-	frc::SmartDashboard::PutString("Left Cim 3", to_string(val));
+	// val = board.GetCurrent(2);
+	//frc::SmartDashboard::PutString("Left Cim 3", to_string(val));
 
 	 val = board.GetCurrent(13);
 	frc::SmartDashboard::PutString("Right Cim 1", to_string(val));
@@ -150,8 +150,8 @@ void Log::ProgrammingTabInfoLog(){
 	 val = board.GetCurrent(14);
 	frc::SmartDashboard::PutString("Right Cim 2", to_string(val));
 
-	val = board.GetCurrent(15);
-	frc::SmartDashboard::PutString("Right Cim 3", to_string(val));
+	//val = board.GetCurrent(15);
+	//frc::SmartDashboard::PutString("Right Cim 3", to_string(val));
 	//frc::SmartDashboard::PutString("DB/String 4",to_string(board.GetCurrent(15)));
 
 	val = board.GetCurrent(3);

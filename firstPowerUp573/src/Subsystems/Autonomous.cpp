@@ -1,12 +1,15 @@
 #include <Subsystems/Autonomous.h>
 #include <WPILib.h>
 
+
 using namespace std;
-Autonomous::Autonomous() : Subsystem("Drive") {
+Autonomous::Autonomous() : Subsystem("Auto") {
 
 
 
 }
+
+
 
 //Function to select autonomous mode based on initial position, field layout, and tasks
 int Autonomous::ModeSelect() {
@@ -24,6 +27,12 @@ int Autonomous::ModeSelect() {
 
 	SmartDashboard::PutString("DB/String 5", layout);
 	SmartDashboard::PutString("DB/String 6", layoutChars);
+
+	//Auto Test 1
+
+	//Turn 90 and wait
+
+
 
 	switch (startPosition) {
 
