@@ -17,7 +17,7 @@ Drive::Drive() : Subsystem("Drive") {
 	RightDrive = new Talon(RightDrivePWM);
 	MyGyro = new ADXRS450_Gyro();
 	LeftDriveEncoder = new Encoder(0, 1, false, Encoder::k4X);
-	//RightDriveEncoder = new Encoder(2, 3, false, Encoder::k4X);
+	RightDriveEncoder = new Encoder(2, 3, false, Encoder::k4X);
 	Shifter = new DoubleSolenoid(PCM, ShifterPort1, ShifterPort2);
 	LeftDrive->SetInverted(true);
 
@@ -90,7 +90,7 @@ void Drive::CameraCenter(double y) {
 	//Hardcoded P function
 	double PIDTurn;
 	double xError = 0 - targetOffsetAngle_Horizontal;
-	double kP = 0.02;
+	double kP = 0.5;
 	PIDTurn = kP * xError;
 
 	if(PIDTurn > .8) {
@@ -117,7 +117,7 @@ void Drive::GyroSetpoint(double degrees) {
 	double gyroCurrent = MyGyro->GetAngle();
 	double gyroError = degrees - gyroCurrent;
 	double PIDTurn;
-	double kP = -0.0075;
+	double kP = -0.01;
 	PIDTurn = kP * gyroError;
 
 	frc::SmartDashboard::PutString("DB/String 1", to_string(gyroCurrent));
@@ -147,17 +147,17 @@ void Drive::EncoderSetpoint(double setpoint) {
 	//Calculating distance covered by robot through encoder
 
 	double leftEncoderVal = LeftDriveEncoder->Get();
-	//double rightEncoderVal = RightDriveEncoder->Get();
+	double rightEncoderVal = RightDriveEncoder->Get();
 
-	double leftDistance = leftEncoderVal * 2.17 / 40;
+	double leftDistance = leftEncoderVal * 5 / 963;
 	frc::SmartDashboard::PutString("DB/String 2", to_string(leftDistance));
-	//double rightDistance = rightEncoderVal * 2.17 / 40;
-	//frc::SmartDashboard::PutString("DB/String 3", to_string(rightEncoderVal));
+	double rightDistance = rightEncoderVal * 5 / 963;
+	frc::SmartDashboard::PutString("DB/String 3", to_string(rightEncoderVal));
 	//double avgDistance = (leftDistance + rightDistance) / 2;
-	double avgDistance = leftDistance;
+	double avgDistance = rightDistance;
 
 	double distanceError = setpoint - avgDistance;
-	double kPEncoder = 0.1;
+	double kPEncoder = -0.4;
 	double output = kPEncoder * distanceError;
 
 	//------------------- Gyro stabilization -------------------------------
@@ -183,15 +183,28 @@ void Drive::EncoderSetpoint(double setpoint) {
 	double leftPower = output + PIDTurn;
 	double rightPower = output - PIDTurn;
 
+	if (leftPower > .75){
+		leftPower = .75;
+	}
+	else if (leftPower < -.75){
+		leftPower = -.75;
+	}
+
+	if (rightPower > .75){
+		rightPower = .75;
+	}
+	else if (rightPower < -.75){
+		rightPower = -.75;
+	}
 	LeftDrive->Set(leftPower); //Set left value to left drive
 	RightDrive->Set(rightPower); //Set right value to right drive
 
 }
 
 void Drive::EncoderReset() {
- double blah;
-	//LeftDriveEncoder->Reset();
-	//RightDriveEncoder>Reset();
+ //double blah;
+	LeftDriveEncoder->Reset();
+	RightDriveEncoder->Reset();
 
 
 }
@@ -210,8 +223,8 @@ void Drive::ProgrammingTabInfoDrive(){
 	double leftenc = LeftDriveEncoder->Get();
 	frc::SmartDashboard::PutString("Drive Encoder Left", to_string(leftenc));
 
-	//double rightenc = RightDriveEncoder->Get();
-	//frc::SmartDashboard::PutString("Drive Encoder Right", to_string(rightenc));
+	double rightenc = RightDriveEncoder->Get();
+	frc::SmartDashboard::PutString("Drive Encoder Right", to_string(rightenc));
 
 	std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
 	float targetOffsetAngle_Horizontal = table->GetNumber("tx",0);

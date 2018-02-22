@@ -30,6 +30,9 @@ Encoder * ElevatorEncoder;
 
 AnalogInput * Ultrasonic;
 
+Talon * RampLeft;
+Talon * RampRight;
+
 
 
 
@@ -39,11 +42,11 @@ Appendage();
 	void InitDefaultCommand();
 	void Claw(double speed);
 	void Elevator(double Joystick, bool a, bool b, bool x, bool y);
-	void Ramp(bool Button1);
+	void Ramp(bool Button1,bool btnleft, bool btnright,bool rampup1,bool rampup2);
 	bool LightGateGet();
 	double GetDistanceUltrasonic();
 	void ProgrammingTabInfoAppendage();
-
+	void EncoderReset();
 
 
 };

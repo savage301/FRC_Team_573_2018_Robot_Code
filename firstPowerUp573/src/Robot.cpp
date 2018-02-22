@@ -35,6 +35,7 @@ public:
 	Autonomous myAuto; //Calling Autonomus.h
 	int count;
 	bool reset1;
+	double timesec;
 
 	frc::PowerDistributionPanel board;
 
@@ -59,6 +60,7 @@ public:
 	void DisabledInit() override {
 
 		myLog.Close();
+		rampcontrol = 0;
 
 	}
 
@@ -100,16 +102,19 @@ public:
 		}
 
 		//myAuto.ModeSelect();
-		count = 0;
+		double delaysec = frc::SmartDashboard::GetNumber("Delay",0);
+		count = delaysec*(-1000/20);
+		//count = 0;
 		reset1 = true;
 		MyDrive.GyroReset();
 		MyDrive.EncoderReset();
+
 
 	}
 
 	void AutonomousPeriodic() override {
 		frc::Scheduler::GetInstance()->Run();
-		double timesec = count * 20/1000;
+		timesec = count * 20/1000;
 
 		string layout = DriverStation::GetInstance().GetGameSpecificMessage();
 
@@ -133,6 +138,7 @@ public:
 
 			// -1 left; 0:Middle; 1 Right
 		double startleftorrightdouble = frc::SmartDashboard::GetNumber("Start Location",0);
+
 
 		int startleftorright = (int) startleftorrightdouble;
 
@@ -162,7 +168,11 @@ public:
 
 if (startleftorright == 0 && autoselector == 2){
 //--------Switch from center Automode (Assuming Right side pad) ---------------------
-		if (timesec<1){
+		if (timesec<0)
+		{
+			MyDrive.TankDrive(0,0);
+		}
+		else if (timesec<1){
 			MyDrive.EncoderSetpoint(1);
 		}
 		else if (timesec<2){
@@ -212,7 +222,11 @@ if (startleftorright == 0 && autoselector == 2){
 
 else if ((abs(startleftorright) == 1 && autoselector == 2 && leftorright == startleftorright)||(abs(startleftorright) == 1 && autoselector == 3 && leftorright == startleftorright && leftorrightscale != startleftorright)){
 // -------------- Side Start Switch (Assuming Right side pad)------------------------------
-		if (timesec<1){
+		if (timesec<0)
+		{
+			MyDrive.TankDrive(0,0);
+		}
+		else if (timesec<1){
 			MyDrive.EncoderSetpoint(1);
 		}
 		else if (timesec<2){
@@ -249,11 +263,16 @@ else if (abs(startleftorright) == 1 && autoselector == 3 && leftorrightscale == 
 		bool switchval;
 		if (leftorright == startleftorright){
 			switchval = false; //true is not on our side false is on our side
-		}else{
+		}
+		else{
 			switchval = true;
 		}
 
-		if (timesec<5){
+		if (timesec<0)
+		{
+			MyDrive.TankDrive(0,0);
+		}
+		else if (timesec<5){
 			MyDrive.EncoderSetpoint(25);
 		}
 		else if (timesec<7){
@@ -412,6 +431,7 @@ else{
 		bool YButton = controller1.GetRawButton(4);
 		bool LBButton = controller1.GetRawButton(5);
 		double RTrigger = controller1.GetRawAxis(3);
+
 		bool RTriggerButton;
 		if (abs (RTrigger) > .5){
 			RTriggerButton = true;
@@ -419,7 +439,6 @@ else{
 		else {
 			RTriggerButton = false;
 		}
-
 
 		if(AButton) {
 		// ------------Camera Aided Driving ----------------------
@@ -432,11 +451,7 @@ else{
 
 		} else if(YButton) {
 
-			MyDrive.EncoderSetpoint(108); // Encoder setpoint test TO BE REMOVED
-
-		} else if(YButton) {
-
-			MyDrive.EncoderSetpoint(108);
+			MyDrive.EncoderSetpoint(5); // Encoder setpoint test TO BE REMOVED
 
 		} else {
 
@@ -516,10 +531,10 @@ else{
 		}
 
 		//Setting claw talons power settings
-		if (clawinbtn){
+		if (clawinbtn && rampcontrol != 1){
 			MyAppendage.Claw(.8); //Claw in
 		}
-		else if (clawoutbtn){
+		else if (clawoutbtn && rampcontrol != 1){
 			MyAppendage.Claw(-.8); // Claw out
 		}
 		else {
@@ -540,9 +555,15 @@ else{
 		bool elevatorpos1 = controller2.GetRawButton(2);
 		bool elevatorpos2 = controller2.GetRawButton(3);
 		bool elevatorpos3 = controller2.GetRawButton(4);
+		bool encoderreset = controller2.GetRawButton (7);
 
 		//Call elevator function
 		MyAppendage.Elevator(elevatorraw, elevatorground, elevatorpos1, elevatorpos2, elevatorpos3);
+
+		//Encoder Reset TO BE REMOVED
+		if (encoderreset){
+		MyAppendage.EncoderReset();
+		}
 
 //------------------------------------------------------------------------------------
 
@@ -551,6 +572,8 @@ else{
 	bool rampbutton1 = controller2.GetRawButton(5);
 	bool rampbutton2 = controller2.GetRawButton(6);
 	bool rampbutton3 = controller2.GetRawButton(10);
+	bool rampup1 = controller2.GetRawButton (7); //Ramp up 1
+	bool rampup2 = controller2.GetRawButton (8); //Ramp up 2
 
 	if (rampbutton1 && rampbutton2){
 		rampcontrol = 1;
@@ -559,7 +582,7 @@ else{
 		rampcontrol = 0;
 	}
 
-	MyAppendage.Ramp(rampcontrol);
+	MyAppendage.Ramp(rampcontrol,clawinbtn,clawoutbtn,rampup1,rampup2);
 
 
 	}
