@@ -17,7 +17,7 @@ Talon * RightDrive;
 //RobotDrive * MyRobotDrive;
 ADXRS450_Gyro * MyGyro;
 Encoder * LeftDriveEncoder;
-//Encoder * RightDriveEncoder;
+Encoder * RightDriveEncoder;
 DoubleSolenoid * Shifter;
 
 

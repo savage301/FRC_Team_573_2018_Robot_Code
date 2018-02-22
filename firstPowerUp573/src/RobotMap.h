@@ -47,6 +47,10 @@ constexpr int ElevatorEncoder2 = 5;
 
 constexpr int UltrasonicPort = 0;
 
+constexpr int RampLeftPWM = 6;
+constexpr int RampRightPWM = 7;
+
+
 
 
 

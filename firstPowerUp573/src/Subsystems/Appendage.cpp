@@ -24,6 +24,9 @@ Appendage::Appendage() : Subsystem("Appendage") {
 	ElevatorEncoder = new Encoder(ElevatorEncoder1, ElevatorEncoder2, false, Encoder::k4X);
 	Ultrasonic = new AnalogInput(UltrasonicPort);
 
+	RampLeft = new Talon(RampLeftPWM);
+	RampRight = new Talon(RampRightPWM);
+
 
 }
 
@@ -74,10 +77,10 @@ void Appendage::Claw(double speed) {
 }
 void Appendage::Elevator(double Joystick, bool a, bool b, bool x, bool y){
 
-	double PosA = 0;
-	double PosB = 30;
-	double PosX = 50;
-	double PosY = 70;
+	double PosA = 150;
+	double PosB = 2142;
+	double PosX = 5550;
+	double PosY = 150;
 	//double Encodererror;
 	double absJoystick = abs(Joystick);
 
@@ -100,9 +103,17 @@ void Appendage::Elevator(double Joystick, bool a, bool b, bool x, bool y){
 		ElevPID(PosY);
 	}
 	else if (absJoystick > .25){
+		if (Joystick > 0){
+			Elevator1->Set(.25);
+			Elevator2->Set(.25);
+			Brake->Set(DoubleSolenoid::Value::kReverse);
+		}
+		else{
 		Elevator1->Set(Joystick);
 		Elevator2->Set(Joystick);
 		Brake->Set(DoubleSolenoid::Value::kReverse);
+		}
+
 	}
 	else {
 		Elevator1->Set(0);
@@ -115,14 +126,33 @@ void Appendage::Elevator(double Joystick, bool a, bool b, bool x, bool y){
 
 }
 
-void Appendage::Ramp(bool Button1){
+void Appendage::Ramp(bool Button1,bool btnleft, bool btnright,bool rampup1,bool rampup2){
 	if (Button1){
 		Ramp1->Set(DoubleSolenoid::Value::kForward);
-
+		if (btnleft){
+			RampLeft->Set(1);
+		}
+		else if(rampup1){
+			RampLeft->Set(-.75);
+		}
+		else{
+			RampLeft->Set(0);
+		}
+		if (btnright){
+			RampRight->Set(1);
+		}
+		else if (rampup2){
+			RampRight->Set(-.75);
+		}
+		else{
+			RampRight->Set(0);
+		}
 	}
+
 	else {
 		Ramp1->Set(DoubleSolenoid::Value::kReverse);
-
+		RampLeft->Set(0);
+		RampRight->Set(0);
 	}
 }
 
@@ -131,21 +161,28 @@ void Appendage::ElevPID(double POS){
 	double EncoderDistance = ElevatorEncoder->GetDistance();
 	auto Gyrooutstr = std::to_string(EncoderDistance);
 	frc::SmartDashboard::PutString("DB/String 0",Gyrooutstr);
-	double Kp = -0.04;
+	double Kp = -0.001;
 
 	double Encodererror = POS - EncoderDistance;
 	auto Gyrooutstr1 = std::to_string(Encodererror);
 	frc::SmartDashboard::PutString("DB/String 1",Gyrooutstr1);
-		if (abs (Encodererror) < 0.5){
+		if (abs (Encodererror) < 250){
 				Elevator1->Set(0);
 				Elevator2->Set(0);
 				Brake->Set(DoubleSolenoid::Value::kForward);
 			}
 		else {
-				Elevator1->Set(Kp*Encodererror);
+		if (Kp*Encodererror >.25){
+			Elevator1->Set(.25);
+			Elevator2->Set(.25);
+			Brake->Set(DoubleSolenoid::Value::kReverse);
+		}
+		else{
+			Elevator1->Set(Kp*Encodererror);
 				Elevator2->Set(Kp*Encodererror);
 				Brake->Set(DoubleSolenoid::Value::kReverse);
 			}
+		}
 
 }
 
@@ -177,5 +214,13 @@ void Appendage::ProgrammingTabInfoAppendage(){
 
 	val = ElevatorEncoder->GetDistance();
 	frc::SmartDashboard::PutString("Lift Encoder", to_string(val));
+
+}
+
+void Appendage::EncoderReset() {
+ //double blah;
+	ElevatorEncoder->Reset();
+
+
 
 }
