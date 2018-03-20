@@ -71,7 +71,6 @@ void Drive::CameraCenter(double y) {
 	//------------------------ vision read-in -----------------------------
 
 	std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
-
 	table->PutNumber("ledMode",1);
 	table->PutNumber("pipeline",4);
 
@@ -90,7 +89,7 @@ void Drive::CameraCenter(double y) {
 	//Hardcoded P function
 	double PIDTurn;
 	double xError = 0 - targetOffsetAngle_Horizontal;
-	double kP = 0.5;
+	double kP = 0.025;
 	PIDTurn = kP * xError;
 
 	if(PIDTurn > .8) {
@@ -117,7 +116,7 @@ void Drive::GyroSetpoint(double degrees) {
 	double gyroCurrent = MyGyro->GetAngle();
 	double gyroError = degrees - gyroCurrent;
 	double PIDTurn;
-	double kP = -0.01;
+	double kP = -0.015;
 	PIDTurn = kP * gyroError;
 
 	frc::SmartDashboard::PutString("DB/String 1", to_string(gyroCurrent));
@@ -160,11 +159,21 @@ void Drive::EncoderSetpoint(double setpoint) {
 	double kPEncoder = -0.4;
 	double output = kPEncoder * distanceError;
 
+	if(output > .75) {
+
+		output = .75;
+
+	} else if(output < -.75) {
+
+		output = -.75;
+
+	}
+
 	//------------------- Gyro stabilization -------------------------------
 
 	double gyroCurrent = MyGyro->GetAngle();
 	double gyroError = 0 - gyroCurrent;
-	double kPGyro = -0.0075;
+	double kPGyro = -0.04;
 	double PIDTurn = kPGyro * gyroError;
 
 	frc::SmartDashboard::PutString("DB/String 4", to_string(gyroCurrent));
@@ -183,18 +192,18 @@ void Drive::EncoderSetpoint(double setpoint) {
 	double leftPower = output + PIDTurn;
 	double rightPower = output - PIDTurn;
 
-	if (leftPower > .75){
-		leftPower = .75;
+	if (leftPower > .9){
+		leftPower = .9;
 	}
-	else if (leftPower < -.75){
-		leftPower = -.75;
+	else if (leftPower < -.9){
+		leftPower = -.9;
 	}
 
-	if (rightPower > .75){
-		rightPower = .75;
+	if (rightPower > .9){
+		rightPower = .9;
 	}
-	else if (rightPower < -.75){
-		rightPower = -.75;
+	else if (rightPower < -.9){
+		rightPower = -.9;
 	}
 	LeftDrive->Set(leftPower); //Set left value to left drive
 	RightDrive->Set(rightPower); //Set right value to right drive
@@ -227,6 +236,8 @@ void Drive::ProgrammingTabInfoDrive(){
 	frc::SmartDashboard::PutString("Drive Encoder Right", to_string(rightenc));
 
 	std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
+	table->PutNumber("ledMode",1);
+	table->PutNumber("pipeline",4);
 	float targetOffsetAngle_Horizontal = table->GetNumber("tx",0);
 	float targetOffsetAngle_Vertical = table->GetNumber("ty",0);
 	float targetArea = table->GetNumber("ta",0);
@@ -264,3 +275,54 @@ void Drive::Booster(bool button){
 	}
 }
 
+void Drive::StraightGyro(double y) {
+
+
+	//Hardcoded P function
+	double gyroCurrent = MyGyro->GetAngle();
+	double gyroError = 0 - gyroCurrent;
+	double kPGyro = -0.04;
+	double PIDTurn = kPGyro * gyroError;
+
+
+	if(PIDTurn > .8) {
+
+		PIDTurn = .8;
+
+	} else if(PIDTurn < -.8) {
+
+		PIDTurn = -.8;
+
+	}
+
+	if(y > .75) {
+
+	y = .75;
+
+	} else if(y < -.75) {
+
+	y = -.75;
+
+	}
+
+	//Hardcoding arcade drive with y and pivot axes
+	double leftPower = (y + PIDTurn);
+	double rightPower = (y - PIDTurn);
+
+	if (leftPower > .9){
+		leftPower = .9;
+	}
+	else if (leftPower < -.9){
+		leftPower = -.9;
+	}
+
+	if (rightPower > .9){
+		rightPower = .9;
+	}
+	else if (rightPower < -.9){
+		rightPower = -.9;
+	}
+	LeftDrive->Set(leftPower); //Set left value to left drive
+	RightDrive->Set(rightPower); //Set right value to right drive
+
+}

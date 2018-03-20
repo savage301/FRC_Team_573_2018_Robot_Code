@@ -32,6 +32,7 @@ public:
 	void EncoderReset();
 	void ProgrammingTabInfoDrive();
 	void Booster(bool button);
+	void StraightGyro(double y);
 
 };
 

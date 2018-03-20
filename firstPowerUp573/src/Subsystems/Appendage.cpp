@@ -54,15 +54,15 @@ void Appendage::Claw(double speed) {
 
 
 	if (speed <= 0){
-		ClawMotorLeft1->Set(speed); //Set left value to talon
+		ClawMotorRight1->Set(speed); //Set left value to talon
 		double invspeed = (-1)*speed;
-		ClawMotorRight1->Set(invspeed); //Set left value to talon
+		ClawMotorLeft1->Set(invspeed); //Set left value to talon
 
 	}
-	else if (speed > 0 and Boxlightgate->Get()){
-		ClawMotorLeft1->Set(speed); //Set left value to talon
+	else if (speed > 0){ //and Boxlightgate->Get()){ Removed lightgate for stopping intake on claw
+		ClawMotorRight1->Set(speed); //Set left value to talon
 		double invspeed = (-1)*speed;
-		ClawMotorRight1->Set(invspeed); //Set left value to talon
+		ClawMotorLeft1->Set(invspeed); //Set left value to talon
 
 	}
 	else {
@@ -78,7 +78,7 @@ void Appendage::Claw(double speed) {
 void Appendage::Elevator(double Joystick, bool a, bool b, bool x, bool y){
 
 	double PosA = 150;
-	double PosB = 2142;
+	double PosB = 2800;
 	double PosX = 5550;
 	double PosY = 150;
 	//double Encodererror;

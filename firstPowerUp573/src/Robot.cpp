@@ -40,13 +40,13 @@ public:
 	frc::PowerDistributionPanel board;
 
 	void RobotInit() override {
-		m_chooser.AddDefault("Default Auto", &m_defaultAuto);
-		m_chooser.AddObject("My Auto", &m_myAuto);
-		frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
+		//m_chooser.AddDefault("Default Auto", &m_defaultAuto);
+		//m_chooser.AddObject("My Auto", &m_myAuto);
+		//frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
 		//Turning off Limelight LEDs upon robot init
 		std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
-		table->PutNumber("ledMode",1);
+		table->PutNumber("ledMode", 1);
 
 	}
 
@@ -61,6 +61,9 @@ public:
 
 		myLog.Close();
 		rampcontrol = 0;
+		//Turning off Limelight LEDs upon robot init
+		std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
+		table->PutNumber("ledMode", 0);
 
 	}
 
@@ -69,7 +72,7 @@ public:
 
 		//Turning off Limelight LEDs when robot is disabled
 		std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
-		table->PutNumber("ledMode",1);
+		table->PutNumber("ledMode", 1);
 	}
 
 	/**
@@ -87,7 +90,7 @@ public:
 	 * to the if-else structure below with additional strings & commands.
 	 */
 	void AutonomousInit() override {
-		std::string autoSelected = frc::SmartDashboard::GetString(
+		/*std::string autoSelected = frc::SmartDashboard::GetString(
 				"Auto Selector", "Default");
 		if (autoSelected == "My Auto") {
 			m_autonomousCommand = &m_myAuto;
@@ -99,10 +102,14 @@ public:
 
 		if (m_autonomousCommand != nullptr) {
 			m_autonomousCommand->Start();
-		}
+		}*/
 
 		//myAuto.ModeSelect();
+		std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
+		table->PutNumber("ledMode",0);
 		double delaysec = frc::SmartDashboard::GetNumber("Delay",0);
+		//frc::SmartDashboard::PutString("DB/String 4",std::to_string(delaysec));
+
 		count = delaysec*(-1000/20);
 		//count = 0;
 		reset1 = true;
@@ -113,8 +120,10 @@ public:
 	}
 
 	void AutonomousPeriodic() override {
+		std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
+		table->PutNumber("ledMode",1);
 		frc::Scheduler::GetInstance()->Run();
-		timesec = count * 20/1000;
+		timesec = count * 20.0/1000;
 
 		string layout = DriverStation::GetInstance().GetGameSpecificMessage();
 
@@ -137,13 +146,38 @@ public:
 				}
 
 			// -1 left; 0:Middle; 1 Right
-		double startleftorrightdouble = frc::SmartDashboard::GetNumber("Start Location",0);
+		string startleftorrightstring = frc::SmartDashboard::GetString("Start Location","0");
+		int startleftorright = 0;
+		if (startleftorrightstring == "0"){
+			startleftorright = 0;
+		}
+		else if (startleftorrightstring == "1"){
+			startleftorright = 1;
+		}
+		else if (startleftorrightstring == "-1"){
+			startleftorright = -1;
+		}
+
+		string autoselectorstring = frc::SmartDashboard::GetString("Auto Selector","0");
+
+		int autoselector = 0;
+			if (autoselectorstring == "0"){
+				autoselector = 0;
+			}
+			else if (autoselectorstring == "1"){
+				autoselector = 1;
+			}
+			else if (autoselectorstring == "2"){
+				autoselector = 2;
+			}
+			else if (autoselectorstring == "3"){
+				autoselector = 3;
+			}
 
 
-		int startleftorright = (int) startleftorrightdouble;
+		frc::SmartDashboard::PutString("DB/String 7",std::to_string(autoselector));
+		frc::SmartDashboard::PutString("DB/String 8",std::to_string(timesec));
 
-		double autoselectordouble = frc::SmartDashboard::GetNumber("Auto Selector",0);
-		int autoselector = (int) autoselectordouble;
 
 //Junk Code ------------------------------------------
 		/*if (timesec<2){
@@ -165,6 +199,11 @@ public:
 		//MyDrive.GyroReset();
 //----------------------------------------------------------------
 
+//Programming Tab Info
+		myLog.ProgrammingTabInfoLog();
+		MyDrive.ProgrammingTabInfoDrive();
+		MyAppendage.ProgrammingTabInfoAppendage();
+
 
 if (startleftorright == 0 && autoselector == 2){
 //--------Switch from center Automode (Assuming Right side pad) ---------------------
@@ -172,45 +211,84 @@ if (startleftorright == 0 && autoselector == 2){
 		{
 			MyDrive.TankDrive(0,0);
 		}
-		else if (timesec<1){
-			MyDrive.EncoderSetpoint(1);
+		else if (timesec<.25){
+			MyAppendage.Elevator(0, false,true,false,false);
 		}
-		else if (timesec<2){
-			MyDrive.GyroSetpoint(90*leftorright);
+		else if (timesec<.5){
+			MyAppendage.Elevator(0, true,false,false,false);
+			MyAppendage.Claw(1);
 		}
-		else if (timesec<5){
-
-			if(reset1){
-				MyDrive.EncoderReset();
-				MyDrive.GyroReset();
-				reset1 = false;
-			}
-
-			MyDrive.EncoderSetpoint(3);
-		}
-		else if (timesec<6){
-			MyDrive.GyroSetpoint(-90*leftorright);
+		else if (timesec<1.25){
+			MyDrive.EncoderSetpoint(2);
+			MyAppendage.Claw(0);
+			MyAppendage.Elevator(0, false,false,false,false);
 			reset1 = true;
 		}
-		else if (timesec<9){
+		else if (timesec<1.7){
+			if(reset1){
+							MyDrive.EncoderReset();
+							MyDrive.GyroReset();
+							reset1 = false;
+						}
+			MyDrive.GyroSetpoint(90*leftorright);
+			MyAppendage.Claw(1);
+		}
+		else if (timesec<1.8){
+			reset1=true;
+		}
+		else if (timesec<3.5){
 
 			if(reset1){
 				MyDrive.EncoderReset();
 				MyDrive.GyroReset();
 				reset1 = false;
 			}
+			MyAppendage.Claw(0);
+			if (leftorright == -1){
+				MyDrive.EncoderSetpoint(6.5);
+			}
+			else{
+				MyDrive.EncoderSetpoint(3.5);
+			}
+
+		}
+		else if (timesec<3.6){
+			reset1 = true;
+		}
+		else if (timesec<4.2){
+			if(reset1){
+							MyDrive.EncoderReset();
+							MyDrive.GyroReset();
+							reset1 = false;
+			}
+			MyDrive.GyroSetpoint(-80*leftorright);
+			MyAppendage.Claw(1);
+		}
+		else if (timesec<4.5){
+
+
+				MyDrive.EncoderReset();
+				MyDrive.GyroReset();
+				reset1 = true;
+
+			//MyAppendage.Elevator(0, false,true,false,false);
+			MyDrive.TankDrive(0,0);
+			MyAppendage.Claw(0);
+
+		}
+		else if (timesec<6){
+			if(reset1){
+										MyDrive.EncoderReset();
+										MyDrive.GyroReset();
+										reset1 = false;
+						}
+			MyDrive.EncoderSetpoint(7.5);
 			MyAppendage.Elevator(0, false,true,false,false);
-			MyDrive.TankDrive(0,0);
-
 		}
-		else if (timesec<10){
-
-			MyDrive.EncoderSetpoint(1);
+		else if (timesec<7){
+			MyAppendage.Claw(-1);
+			MyDrive.TankDrive(0,0);
 			MyAppendage.Elevator(0, false,false,false,false);
-		}
-		else if (timesec<11){
-			MyAppendage.Claw(-.8);
-			MyDrive.TankDrive(0,0);
 		}
 		else{
 			MyDrive.TankDrive(0,0);
@@ -226,26 +304,47 @@ else if ((abs(startleftorright) == 1 && autoselector == 2 && leftorright == star
 		{
 			MyDrive.TankDrive(0,0);
 		}
-		else if (timesec<1){
-			MyDrive.EncoderSetpoint(1);
+		else if (timesec<.25){
+			MyAppendage.Elevator(0, false,true,false,false);
 		}
-		else if (timesec<2){
-			MyDrive.GyroSetpoint(-90*startleftorright);
+		else if (timesec<.5){
+					MyAppendage.Elevator(0, true,false,false,false);
+					MyAppendage.Claw(1);
+				}
+		else if (timesec<3.5){
+			MyDrive.EncoderSetpoint(12);
+			MyAppendage.Elevator(0, false,false,false,false);
+			MyAppendage.Claw(0);
+			reset1 = true;
 		}
 		else if (timesec<4){
-			if(reset1){
-				MyDrive.EncoderReset();
-				MyDrive.GyroReset();
-				reset1 = false;
-			}
-			MyAppendage.Elevator(0, false,true,false,false);
-			MyDrive.TankDrive(0,0);
+					if(reset1){
+						MyDrive.EncoderReset();
+						MyDrive.GyroReset();
+						reset1 = false;
+						}
+					MyDrive.GyroSetpoint(-90*startleftorright);
+
+				}
+		else if (timesec<4.5){
+
+				MyAppendage.Elevator(0, false,true,false,false);
+				MyDrive.TankDrive(0,0);
+				reset1=true;
+
 		}
+
 		else if (timesec<6){
-			MyDrive.EncoderSetpoint(2);
-			MyAppendage.Elevator(0, false,false,false,false);
+			if(reset1){
+			MyDrive.EncoderReset();
+			MyDrive.GyroReset();
+			reset1 = false;
+			}
+
+			MyDrive.EncoderSetpoint(3);
+
 		}
-		else if (timesec<7){
+		else if (timesec<7.5){
 			MyAppendage.Claw(-.8);
 			MyDrive.TankDrive(0,0);
 		}
@@ -268,14 +367,18 @@ else if (abs(startleftorright) == 1 && autoselector == 3 && leftorrightscale == 
 			switchval = true;
 		}
 
-		if (timesec<0)
-		{
+		if (timesec<0){
 			MyDrive.TankDrive(0,0);
 		}
-		else if (timesec<5){
-			MyDrive.EncoderSetpoint(25);
+		else if (timesec<.5){
+			MyAppendage.Elevator(0, false,true,false,false);
 		}
-		else if (timesec<7){
+		else if (timesec<4.5){
+			MyDrive.EncoderSetpoint(21.5);
+			MyAppendage.Elevator(0, false,false,false,false);
+			reset1=true;
+		}
+		else if (timesec<6){
 			if(reset1){
 				MyDrive.EncoderReset();
 				MyDrive.GyroReset();
@@ -284,16 +387,27 @@ else if (abs(startleftorright) == 1 && autoselector == 3 && leftorrightscale == 
 			MyAppendage.Elevator(0, false,false,false,true);
 			MyDrive.TankDrive(0,0);
 		}
-		else if (timesec<8){
+
+		else if(timesec<6.5){
+			MyDrive.GyroSetpoint(-35*startleftorright);
+			reset1 = true;
+
+		}
+		else if (timesec<7.5){
+			if(reset1){
+				MyDrive.EncoderReset();
+				MyDrive.GyroReset();
+				reset1 = false;
+						}
 			MyDrive.EncoderSetpoint(1);
 			MyAppendage.Elevator(0, false,false,false,false);
 		}
-		else if (timesec<9){
+		else if (timesec<8){
 			MyAppendage.Claw(-.8);
 			MyDrive.TankDrive(0,0);
 			reset1 = true;
 		}
-		else if (timesec<10){
+		else if (timesec<9){
 			if(reset1){
 				MyDrive.EncoderReset();
 				MyDrive.GyroReset();
@@ -302,39 +416,36 @@ else if (abs(startleftorright) == 1 && autoselector == 3 && leftorrightscale == 
 			MyDrive.EncoderSetpoint(-1);
 			MyAppendage.Claw(0);
 		}
-		else if (timesec<12){
+		else if (timesec<10){
 			reset1 = true;
 			MyDrive.TankDrive(0,0);
 			MyAppendage.Elevator(0, true,false,false,false);
 		}
-		else if (timesec<13){
-
-			MyDrive.GyroSetpoint(-90*startleftorright);
-		}
-		else if (timesec<15){
+		else if (timesec<13.5){
 			if(reset1){
 				MyDrive.EncoderReset();
 				MyDrive.GyroReset();
 				reset1 = false;
-						}
-			MyDrive.EncoderSetpoint(2);
+									}
+			MyDrive.GyroSetpoint(-100*startleftorright);
 		}
-		else if (timesec<16){
-
-			MyDrive.GyroSetpoint(-90*startleftorright);
-			reset1 = true;
-		}
-		else if (timesec<18){
+		else if (timesec<14.5){
 			bool boxinclaw = MyAppendage.LightGateGet();
 			if (boxinclaw){
 				MyDrive.TankDrive(0,0);
 			}
 			else{
-			MyDrive.CameraCenter(.5);
+			MyDrive.CameraCenter(-.75);
 			MyAppendage.Claw(.8);
 			}
 		}
-		else if (timesec<19){
+		else if (timesec<17){
+		if(switchval){
+						count = 100000; //Messes with count to not place the cube on switch if its not infront of the right one.
+								}
+		}
+		else if (timesec<18.5){
+
 			if(reset1){
 				MyDrive.EncoderReset();
 				MyDrive.GyroReset();
@@ -344,7 +455,7 @@ else if (abs(startleftorright) == 1 && autoselector == 3 && leftorrightscale == 
 		}
 
 		//Skip rest if switch isn't ours
-		else if (timesec<21){
+		else if (timesec<21.5){
 			if(switchval){
 				count = 100000; //Messes with count to not place the cube on switch if its not infront of the right one.
 			}
@@ -352,7 +463,7 @@ else if (abs(startleftorright) == 1 && autoselector == 3 && leftorrightscale == 
 			MyDrive.TankDrive(0,0);
 			reset1=true;
 		}
-		else if (timesec<22){
+		else if (timesec<22.5){
 			if(reset1){
 				MyDrive.EncoderReset();
 				MyDrive.GyroReset();
@@ -361,7 +472,7 @@ else if (abs(startleftorright) == 1 && autoselector == 3 && leftorrightscale == 
 			MyDrive.EncoderSetpoint(1);
 			MyAppendage.Elevator(0, false,false,false,false);
 		}
-		else if (timesec<23){
+		else if (timesec<23.5){
 			MyAppendage.Claw(-.8);
 			MyDrive.TankDrive(0,0);
 		}
@@ -379,13 +490,32 @@ else if ( autoselector == 0){
 	MyDrive.TankDrive(0,0);
 }
 else{
+	if(timesec<0){
+	MyDrive.TankDrive(0,0);
+	}
+	else if (timesec<.25){
+		MyAppendage.Elevator(0, false,true,false,false);
+	}
+	else if (timesec<.5){
+	MyAppendage.Elevator(0, true,false,false,false);
+	MyAppendage.Claw(1);
+	}
+	else if(timesec<2.5){
 	//Drive forward
-	MyDrive.EncoderSetpoint(7);
+	MyDrive.EncoderSetpoint(8);
+	MyAppendage.Claw(0);
+	MyAppendage.Elevator(0, false,false,false,false);
+	}
+	else{
+	MyDrive.TankDrive(0,0);
+	}
 }
 		count = count + 1;
 	}
 
 	void TeleopInit() override {
+		std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
+		table->PutNumber("ledMode",0);
 		// This makes sure that the autonomous stops running when
 		// teleop starts running. If you want the autonomous to
 		// continue until interrupted by another command, remove
@@ -432,6 +562,7 @@ else{
 		bool LBButton = controller1.GetRawButton(5);
 		double RTrigger = controller1.GetRawAxis(3);
 
+
 		bool RTriggerButton;
 		if (abs (RTrigger) > .5){
 			RTriggerButton = true;
@@ -447,15 +578,21 @@ else{
 
 		} else if(BButton) {
 
-			MyDrive.GyroSetpoint(90); // Gryo setpoint test TO BE REMOVED
+			if (gyroreset){ //resets gyro if first time through loop
+				MyDrive.GyroReset();
+				gyroreset = false;
+			}
+
+			MyDrive.StraightGyro(leftin); //Use Gryo to drive straight
+			//MyDrive.GyroSetpoint(90); // Gryo setpoint test TO BE REMOVED
 
 		} else if(YButton) {
 
-			MyDrive.EncoderSetpoint(5); // Encoder setpoint test TO BE REMOVED
+			MyDrive.EncoderSetpoint(4); // Encoder setpoint test TO BE REMOVED
 
 		} else {
 
-
+			gyroreset = true;
 			MyDrive.TankDrive(leftin,rightin); //Pass to Tank Drive Function
 			MyDrive.Booster(RTriggerButton);
 
@@ -532,10 +669,10 @@ else{
 
 		//Setting claw talons power settings
 		if (clawinbtn && rampcontrol != 1){
-			MyAppendage.Claw(.8); //Claw in
+			MyAppendage.Claw(1); //Claw in
 		}
 		else if (clawoutbtn && rampcontrol != 1){
-			MyAppendage.Claw(-.8); // Claw out
+			MyAppendage.Claw(-1); // Claw out
 		}
 		else {
 			MyAppendage.Claw(0); //Claw stop
@@ -601,6 +738,7 @@ private:
 	MyAutoCommand m_myAuto;
 	frc::SendableChooser<frc::Command*> m_chooser;
 	bool rampcontrol = 0;
+	bool gyroreset = true;
 };
 
 START_ROBOT_CLASS(Robot)
