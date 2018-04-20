@@ -4,6 +4,7 @@
 #include <Commands/Subsystem.h>
 #include <WPILib.h>
 #include <Encoder.h>
+#include <Relay.h>
 using namespace std;
 
 class Appendage : public Subsystem {
@@ -22,7 +23,11 @@ Talon * Elevator2;
 
 DoubleSolenoid * Brake;
 
-DoubleSolenoid * Ramp1;
+//DoubleSolenoid * Ramp1;
+
+DoubleSolenoid * ClawWristSol;
+
+DoubleSolenoid *ClimberSol;
 
 DigitalInput * Boxlightgate;
 
@@ -32,6 +37,10 @@ AnalogInput * Ultrasonic;
 
 Talon * RampLeft;
 Talon * RampRight;
+
+frc::Relay * WhiteLED;
+frc::Relay * AmberLED;
+
 
 
 
@@ -47,6 +56,10 @@ Appendage();
 	double GetDistanceUltrasonic();
 	void ProgrammingTabInfoAppendage();
 	void EncoderReset();
+	void ClawWrist(bool ButtonUp, bool ButtonDown);
+	void Climber(bool DropForks);
+	void LEDs(bool btn1, bool btn2);
+
 
 
 };

@@ -34,6 +34,7 @@ public:
 	Log myLog; 				//Calling Log.h
 	Autonomous myAuto; //Calling Autonomus.h
 	int count;
+	double plustime;
 	bool reset1;
 	double timesec;
 
@@ -60,10 +61,12 @@ public:
 	void DisabledInit() override {
 
 		myLog.Close();
-		rampcontrol = 0;
+		//rampcontrol = 0;
+		climbcontrol = false;
 		//Turning off Limelight LEDs upon robot init
 		std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
 		table->PutNumber("ledMode", 0);
+		MyAppendage.Climber(false);
 
 	}
 
@@ -105,12 +108,14 @@ public:
 		}*/
 
 		//myAuto.ModeSelect();
+		MyAppendage.ClawWrist(false,true);
 		std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
 		table->PutNumber("ledMode",0);
 		double delaysec = frc::SmartDashboard::GetNumber("Delay",0);
 		//frc::SmartDashboard::PutString("DB/String 4",std::to_string(delaysec));
 
 		count = delaysec*(-1000/20);
+
 		//count = 0;
 		reset1 = true;
 		MyDrive.GyroReset();
@@ -172,6 +177,9 @@ public:
 			}
 			else if (autoselectorstring == "3"){
 				autoselector = 3;
+			}
+			else if (autoselectorstring == "4"){  //Scale no matter what
+				autoselector = 4;
 			}
 
 
@@ -290,15 +298,29 @@ if (startleftorright == 0 && autoselector == 2){
 			MyDrive.TankDrive(0,0);
 			MyAppendage.Elevator(0, false,false,false,false);
 		}
+		//Added Stuff
+		else if (timesec<8){
+			MyAppendage.Claw(0);
+			MyDrive.EncoderSetpoint(2);
+			MyAppendage.Elevator(0, false,false,false,false);
+				}
+		else if (timesec<9){
+					MyAppendage.Claw(0);
+					MyDrive.TankDrive(0,0);
+					MyAppendage.Elevator(0, true,false,false,false);
+						}
+
+		// End Added Stuff
 		else{
 			MyDrive.TankDrive(0,0);
 			MyAppendage.Claw(0);
+			MyAppendage.Elevator(0, false,false,false,false);
 		}
 // ---------------------------------------------------------------
 }
 
 
-else if ((abs(startleftorright) == 1 && autoselector == 2 && leftorright == startleftorright)||(abs(startleftorright) == 1 && autoselector == 3 && leftorright == startleftorright && leftorrightscale != startleftorright)){
+else if ((abs(startleftorright) == 1 && autoselector == 2 && leftorright == startleftorright) or (abs(startleftorright) == 1 && autoselector == 3 && leftorrightscale != startleftorright && leftorright == startleftorright)){
 // -------------- Side Start Switch (Assuming Right side pad)------------------------------
 		if (timesec<0)
 		{
@@ -324,6 +346,7 @@ else if ((abs(startleftorright) == 1 && autoselector == 2 && leftorright == star
 						reset1 = false;
 						}
 					MyDrive.GyroSetpoint(-90*startleftorright);
+					MyAppendage.Claw(1);
 
 				}
 		else if (timesec<4.5){
@@ -331,6 +354,7 @@ else if ((abs(startleftorright) == 1 && autoselector == 2 && leftorright == star
 				MyAppendage.Elevator(0, false,true,false,false);
 				MyDrive.TankDrive(0,0);
 				reset1=true;
+				MyAppendage.Claw(0);
 
 		}
 
@@ -342,6 +366,7 @@ else if ((abs(startleftorright) == 1 && autoselector == 2 && leftorright == star
 			}
 
 			MyDrive.EncoderSetpoint(3);
+			MyAppendage.Elevator(0, false,false,false,false);
 
 		}
 		else if (timesec<7.5){
@@ -358,13 +383,59 @@ else if ((abs(startleftorright) == 1 && autoselector == 2 && leftorright == star
 
 
 else if (abs(startleftorright) == 1 && autoselector == 3 && leftorrightscale == startleftorright){
-// -------------- Side Start Scale (Assuming Right side pad)------------------------------
+	//Scale Auto if they line up
+						if (timesec<0){
+							MyDrive.TankDrive(0,0);
+						}
+						else if (timesec<.5){
+							MyAppendage.Elevator(0, false,true,false,false);
+						}
+						else if (timesec<5.3){
+							MyDrive.EncoderSetpointNonZeroGyro(22,0);	// Drive Past Switch
+							MyAppendage.Elevator(0, false,false,false,false);
+							reset1=true;
+						}
+							else if ( timesec < (7.75)){
+								if(reset1){
+									MyDrive.EncoderReset();
+									reset1 = false;
+								}
+								MyAppendage.Elevator(0, false,false,false,true);
+								MyDrive.TankDrive(0,0);
+							}
+							else if ( timesec < (9.5)){
+								MyDrive.GyroSetpoint(-80*startleftorright); // Turn Left
+								MyAppendage.Elevator(0, false,false,false,false);
+							}
+							else if ( timesec < (9.9)){
+								MyAppendage.Claw(-.8); // Spit box out
+								MyDrive.TankDrive(0,0);
+							}
+							else if (timesec < (11.3)){
+								MyAppendage.Claw(0); //
+								MyDrive.GyroSetpoint(0); // Turn Out
+							}
+							else if (timesec < (12)){
+								MyAppendage.Elevator(0,false,false,false,false);
+								MyDrive.TankDrive(0,0);
+							}
+							else if (timesec < (12.5)){
+								MyAppendage.Elevator(0,false,false,false,false);
+							}
+							else{
+								MyDrive.TankDrive(0,0);
+								MyAppendage.Elevator(0,false,false,false,false);
+								MyAppendage.Claw(0);
+							}
+
+/*
+	// -------------- Side Start Scale (Assuming Right side pad)------------------------------
 		bool switchval;
 		if (leftorright == startleftorright){
-			switchval = false; //true is not on our side false is on our side
+			switchval = true; //true is not on our side false is on our side
 		}
 		else{
-			switchval = true;
+			switchval = false;
 		}
 
 		if (timesec<0){
@@ -481,7 +552,7 @@ else if (abs(startleftorright) == 1 && autoselector == 3 && leftorrightscale == 
 			MyDrive.TankDrive(0,0);
 			MyAppendage.Claw(0);
 		}
-
+*/
 
 // ---------------------------------------------------------------------------------------
 }
@@ -489,6 +560,217 @@ else if ( autoselector == 0){
 	// Do nothing
 	MyDrive.TankDrive(0,0);
 }
+
+// ------------------------- Scale Only ------------------
+else if (autoselector == 4){
+// -------------- Side Start Scale (Assuming Right side pad)------------------------------
+		bool scalesideval;
+		if (leftorrightscale == startleftorright){
+			scalesideval = false;
+		}
+		else{
+			scalesideval = true; //Need To Cross the field
+		}
+
+// -- Same Side Auto
+
+		if(not scalesideval){
+			if (timesec<0){
+										MyDrive.TankDrive(0,0);
+									}
+									else if (timesec<.5){
+										MyAppendage.Elevator(0, false,true,false,false);
+									}
+									else if (timesec<5.3){
+										MyDrive.EncoderSetpointNonZeroGyro(22,0);	// Drive Past Switch
+										MyAppendage.Elevator(0, false,false,false,false);
+										reset1=true;
+									}
+										else if ( timesec < (7.75)){
+											if(reset1){
+												MyDrive.EncoderReset();
+												reset1 = false;
+											}
+											MyAppendage.Elevator(0, false,false,false,true);
+											MyDrive.TankDrive(0,0);
+										}
+										else if ( timesec < (9.5)){
+											MyDrive.GyroSetpoint(-80*startleftorright); // Turn Left
+											MyAppendage.Elevator(0, false,false,false,false);
+										}
+										else if ( timesec < (9.9)){
+											MyAppendage.Claw(-.8); // Spit box out
+											MyDrive.TankDrive(0,0);
+										}
+										else if (timesec < (11.3)){
+											MyAppendage.Claw(0); //
+											MyDrive.GyroSetpoint(0); // Turn Out
+										}
+										else if (timesec < (12)){
+											MyAppendage.Elevator(0,false,false,false,false);
+											MyDrive.TankDrive(0,0);
+										}
+										else if (timesec < (12.5)){
+											MyAppendage.Elevator(0,false,false,false,false);
+										}
+										else{
+											MyDrive.TankDrive(0,0);
+											MyAppendage.Elevator(0,false,false,false,false);
+											MyAppendage.Claw(0);
+										}
+
+		}
+
+// Cross Field Auto
+		if(scalesideval){
+			plustime = 8.5-4; //extra time to be added to other commands for field traverse
+			if (timesec<0){
+						MyDrive.TankDrive(0,0);
+					}
+					else if (timesec<.5){
+						MyAppendage.Elevator(0, false,true,false,false);
+					}
+					else if (timesec<4){
+						MyDrive.EncoderSetpointNonZeroGyro(16.5,0);	// Drive Past Switch
+						MyAppendage.Elevator(0, false,false,false,false);
+						reset1=true;
+					}
+
+			//Traverse Field
+					else if (timesec < 4.5){
+
+								MyDrive.GyroSetpoint(-90*startleftorright); // Turn Left
+							}
+					else if (timesec < 8){
+								if(reset1){
+									MyDrive.EncoderReset();
+									reset1 = false;
+								}
+								MyDrive.EncoderSetpointNonZeroGyro(20,-90*startleftorright); //Drive across field
+							}
+					else if (timesec < 8.5){
+								MyDrive.GyroSetpoint(0);
+								reset1 = true;
+							}
+
+			//Back To Normal
+					else if( timesec < (5.3+plustime)){
+							if(reset1){
+								MyDrive.EncoderReset();
+								reset1 = false;
+							}
+							MyDrive.EncoderSetpointNonZeroGyro(5.5,0);
+						}
+						else if ( timesec < (7+plustime)){
+							MyAppendage.Elevator(0, false,false,false,true);
+							MyDrive.TankDrive(0,0);
+						}
+						else if ( timesec < (8+plustime)){
+							MyDrive.GyroSetpoint(-80*startleftorright); // Turn Left
+							MyAppendage.Elevator(0, false,false,false,false);
+						}
+						else if ( timesec < (8.3+plustime)){
+							MyAppendage.Claw(-.8); // Spit box out
+							MyDrive.TankDrive(0,0);
+						}
+						else if (timesec < (9.3+plustime)){
+							MyAppendage.Claw(0); //
+							MyDrive.GyroSetpoint(0); // Turn Out
+						}
+						else if (timesec < (10+plustime)){
+							MyAppendage.Elevator(0,true,false,false,false);
+							MyDrive.TankDrive(0,0);
+						}
+						else if (timesec < (10.5+plustime)){
+							MyAppendage.Elevator(0,false,false,false,false);
+						}
+		}
+
+//
+
+/*
+		if (timesec<0){
+			MyDrive.TankDrive(0,0);
+		}
+		else if (timesec<.5){
+			MyAppendage.Elevator(0, false,true,false,false);
+		}
+		else if (timesec<4){
+			MyDrive.EncoderSetpointNonZeroGyro(15,0);	// Drive Past Switch
+			MyAppendage.Elevator(0, false,false,false,false);
+			reset1=true;
+		}
+
+		else if (timesec < 15){
+			//Turn Or drive forward
+			if (scalesideval){
+
+				// Traverse field commands
+				if (timesec < 4.5){
+
+					MyDrive.GyroSetpoint(-90*startleftorright); // Turn Left
+				}
+				else if (timesec < 8){
+					if(reset1){
+						MyDrive.EncoderReset();
+						reset1 = false;
+					}
+					MyDrive.EncoderSetpointNonZeroGyro(20,-90*startleftorright);
+				}
+				else if (timesec < 8.5){
+					MyDrive.GyroSetpoint(0);
+					reset1 = true;
+				}
+
+				plustime = 8.5-4; //extra time to be added to other commands for field traverse
+			}
+
+
+			else{
+				plustime = 0;
+			}
+
+			if( timesec < (plustime+5.3)){
+				if(reset1){
+					MyDrive.EncoderReset();
+					reset1 = false;
+				}
+				MyDrive.EncoderSetpointNonZeroGyro(7,0);
+			}
+			else if ( timesec < (plustime+7)){
+				MyAppendage.Elevator(0, false,false,false,true);
+				MyDrive.TankDrive(0,0);
+			}
+			else if ( timesec < (plustime+8)){
+				MyDrive.GyroSetpoint(-80*startleftorright); // Turn Left
+				MyAppendage.Elevator(0, false,false,false,false);
+			}
+			else if ( timesec < (plustime+8.3)){
+				MyAppendage.Claw(-.8); // Spit box out
+				MyDrive.TankDrive(0,0);
+
+			}
+			else if (timesec < (plustime+9.3)){
+				MyAppendage.Claw(0); //
+				MyDrive.GyroSetpoint(0); // Turn Out
+			}
+			else if (timesec < (plustime+10)){
+				MyAppendage.Elevator(0,true,false,false,false);
+				MyDrive.TankDrive(0,0);
+			}
+			else if (timesec < (plustime+10.5)){
+				MyAppendage.Elevator(0,false,false,false,false);
+			}
+
+		}
+*/
+}
+// ---------------------------------------------------------------------------------------
+
+
+
+// ------ End Scale Only -------------------------
+//Default Auto Cross Line
 else{
 	if(timesec<0){
 	MyDrive.TankDrive(0,0);
@@ -510,8 +792,9 @@ else{
 	MyDrive.TankDrive(0,0);
 	}
 }
-		count = count + 1;
-	}
+
+count = count + 1;
+} //End Auto Peroidic
 
 	void TeleopInit() override {
 		std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
@@ -626,6 +909,18 @@ else{
 
 		frc::SmartDashboard::PutBoolean("Cube in Camview", cubeBool);
 
+// TEMP LED CODE
+
+		bool btn1 = controller1.GetRawButton(7);
+		bool btn2 = controller1.GetRawButton(8);
+
+		if (cubeBool or btn2){
+			btn2 = true;
+		}
+
+		MyAppendage.LEDs(btn1,btn2);
+// ---------------
+
 	//Box in Claw : Checks if light gate is open or closed
 		MyAppendage.LightGateGet();
 
@@ -668,10 +963,10 @@ else{
 		}
 
 		//Setting claw talons power settings
-		if (clawinbtn && rampcontrol != 1){
+		if (clawinbtn){  //&& rampcontrol != 1){
 			MyAppendage.Claw(1); //Claw in
 		}
-		else if (clawoutbtn && rampcontrol != 1){
+		else if (clawoutbtn){// && rampcontrol != 1){
 			MyAppendage.Claw(-1); // Claw out
 		}
 		else {
@@ -704,6 +999,46 @@ else{
 
 //------------------------------------------------------------------------------------
 
+
+
+//----------------------- Claw Wrist -----------------------------------------
+		//REally is climber clyinder
+	bool ClawWristButtonUp = controller2.GetRawButton(5);
+	bool ClawWristButtonDown;
+
+	if (not ClawWristButtonUp){
+		ClawWristButtonDown = true;
+	}
+	MyAppendage.ClawWrist(ClawWristButtonUp,ClawWristButtonDown);
+//--------------------------------------------------------------------
+
+//---------------------- Climber ---------------------------
+	bool climbbutton1 = controller1.GetRawButton(5);
+	bool climbbutton2 = controller1.GetRawButton(6);
+	double climbPOV = controller1.GetPOV(0);
+	bool climbbutton3;
+
+	if (climbPOV < 120 && climbPOV > 60){
+		climbbutton3 = true;
+	}
+	else{
+		climbbutton3 = false;
+	}
+
+	if (climbbutton1 && climbbutton2){
+		climbcontrol = true;
+	}
+	if (climbbutton3){
+		climbcontrol = false;
+	}
+	MyAppendage.Climber(climbcontrol);
+}
+
+//----------------------------------------------------------
+
+
+
+/*
 //---------------------------Ramps-----------------------------
 	//Ramps down with Lbumper and Rbumper ramps back up with right joystick press
 	bool rampbutton1 = controller2.GetRawButton(5);
@@ -723,6 +1058,8 @@ else{
 
 
 	}
+*/
+
 
 //---------------------------------------------------------------------------------------
 
@@ -737,7 +1074,8 @@ private:
 	ExampleCommand m_defaultAuto;
 	MyAutoCommand m_myAuto;
 	frc::SendableChooser<frc::Command*> m_chooser;
-	bool rampcontrol = 0;
+	//bool rampcontrol = 0;
+	bool climbcontrol = false;
 	bool gyroreset = true;
 };
 

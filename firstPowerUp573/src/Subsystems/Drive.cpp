@@ -326,3 +326,74 @@ void Drive::StraightGyro(double y) {
 	RightDrive->Set(rightPower); //Set right value to right drive
 
 }
+
+void Drive::EncoderSetpointNonZeroGyro(double setpoint, double gyrosetpoint) {
+
+	//Wheel moves 2.17 inches per motor revolution
+	//Calculating distance covered by robot through encoder
+
+	double leftEncoderVal = LeftDriveEncoder->Get();
+	double rightEncoderVal = RightDriveEncoder->Get();
+
+	double leftDistance = leftEncoderVal * 5 / 963;
+	frc::SmartDashboard::PutString("DB/String 2", to_string(leftDistance));
+	double rightDistance = rightEncoderVal * 5 / 963;
+	frc::SmartDashboard::PutString("DB/String 3", to_string(rightEncoderVal));
+	//double avgDistance = (leftDistance + rightDistance) / 2;
+	double avgDistance = rightDistance;
+
+	double distanceError = setpoint - avgDistance;
+	double kPEncoder = -0.4;
+	double output = kPEncoder * distanceError;
+
+	if(output > .75) {
+
+		output = .75;
+
+	} else if(output < -.75) {
+
+		output = -.75;
+
+	}
+
+	//------------------- Gyro stabilization -------------------------------
+
+	double gyroCurrent = MyGyro->GetAngle();
+	double gyroError = gyrosetpoint - gyroCurrent;
+	double kPGyro = -0.04;
+	double PIDTurn = kPGyro * gyroError;
+
+	frc::SmartDashboard::PutString("DB/String 4", to_string(gyroCurrent));
+
+	if(PIDTurn > .5) {
+
+		PIDTurn = .5;
+
+	} else if(PIDTurn < -.5) {
+
+		PIDTurn = -.5;
+
+	}
+
+	//Hardcoding arcade drive with y and pivot axes
+	double leftPower = output + PIDTurn;
+	double rightPower = output - PIDTurn;
+
+	if (leftPower > .9){
+		leftPower = .9;
+	}
+	else if (leftPower < -.9){
+		leftPower = -.9;
+	}
+
+	if (rightPower > .9){
+		rightPower = .9;
+	}
+	else if (rightPower < -.9){
+		rightPower = -.9;
+	}
+	LeftDrive->Set(leftPower); //Set left value to left drive
+	RightDrive->Set(rightPower); //Set right value to right drive
+
+}
+

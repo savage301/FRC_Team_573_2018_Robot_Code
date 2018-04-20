@@ -32,11 +32,21 @@ constexpr int ClawMotorRight1PWM = 4;
 constexpr int ElevatorPWM = 2;
 
 constexpr int PCM = 1;
-constexpr int BrakePort1 = 0;
-constexpr int BrakePort2 = 1;
 
-constexpr int Ramp1Port1 = 2;
-constexpr int Ramp1Port2 = 3;
+//Not needed anymore but didn't want to remove it from the elevator code.
+constexpr int BrakePort1 = 6;
+constexpr int BrakePort2 = 7;
+//---------------------------------------------
+
+constexpr int ClawWristPort1 = 0;
+constexpr int ClawWristPort2 = 1;
+
+constexpr int ClimberPort1 = 2;
+constexpr int ClimberPort2 = 3;
+
+//constexpr int Ramp1Port1 = 2;
+//constexpr int Ramp1Port2 = 3;
+
 constexpr int ShifterPort1 = 4;
 constexpr int ShifterPort2 = 5;
 

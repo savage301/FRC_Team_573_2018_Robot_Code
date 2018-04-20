@@ -33,6 +33,7 @@ public:
 	void ProgrammingTabInfoDrive();
 	void Booster(bool button);
 	void StraightGyro(double y);
+	void EncoderSetpointNonZeroGyro(double setpoint, double gyrosetpoint);
 
 };
 

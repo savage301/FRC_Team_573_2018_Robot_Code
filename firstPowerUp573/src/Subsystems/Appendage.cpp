@@ -3,6 +3,7 @@
 #include <WPILib.h>
 #include <cmath>
 #include <Encoder.h>
+#include <Relay.h>
 
 
 
@@ -18,7 +19,9 @@ Appendage::Appendage() : Subsystem("Appendage") {
 	Elevator1 = new Talon(ElevatorPWM);
 	Elevator2 = new Talon(ElevatorPWM);
 	Brake = new DoubleSolenoid(PCM, BrakePort1, BrakePort2);
-	Ramp1 = new DoubleSolenoid(PCM, Ramp1Port1, Ramp1Port2);
+	//Ramp1 = new DoubleSolenoid(PCM, Ramp1Port1, Ramp1Port2);
+	ClawWristSol = new DoubleSolenoid(PCM,ClawWristPort1,ClawWristPort1);
+	ClimberSol = new DoubleSolenoid(PCM,ClimberPort1,ClimberPort2);
 
 	Boxlightgate = new DigitalInput(BoxlightgateDIO);
 	ElevatorEncoder = new Encoder(ElevatorEncoder1, ElevatorEncoder2, false, Encoder::k4X);
@@ -26,6 +29,9 @@ Appendage::Appendage() : Subsystem("Appendage") {
 
 	RampLeft = new Talon(RampLeftPWM);
 	RampRight = new Talon(RampRightPWM);
+
+	WhiteLED = new Relay(2,Relay::kBothDirections);
+	AmberLED = new Relay(0,Relay::kBothDirections);
 
 
 }
@@ -52,22 +58,33 @@ bool Appendage::LightGateGet(){
 
 void Appendage::Claw(double speed) {
 
+	double EncoderDistanceCheck = ElevatorEncoder->GetDistance();
+	if (speed < 0){
 
-	if (speed <= 0){
-		ClawMotorRight1->Set(speed); //Set left value to talon
-		double invspeed = (-1)*speed;
-		ClawMotorLeft1->Set(invspeed); //Set left value to talon
+		if(EncoderDistanceCheck>2200){
+			ClawMotorRight1->Set(-0.4); //Set left value to talon
+			ClawMotorLeft1->Set(0.4); //Set left value to talon
+		}
+		else{
+			ClawMotorRight1->Set(speed); //Set left value to talon
+			double invspeed = (-1)*speed;
+			ClawMotorLeft1->Set(invspeed); //Set left value to talon
+		}
 
 	}
 	else if (speed > 0){ //and Boxlightgate->Get()){ Removed lightgate for stopping intake on claw
+		if(EncoderDistanceCheck>2200){
+			ClawMotorRight1->Set(0.4); //Set left value to talon
+			ClawMotorLeft1->Set(-0.4); //Set left value to talon
+		}
+		else{
 		ClawMotorRight1->Set(speed); //Set left value to talon
 		double invspeed = (-1)*speed;
 		ClawMotorLeft1->Set(invspeed); //Set left value to talon
-
+		}
 	}
 	else {
 		ClawMotorLeft1->Set(0); //Set left value to talon
-
 		ClawMotorRight1->Set(0); //Set left value to talon
 
 	}
@@ -77,10 +94,10 @@ void Appendage::Claw(double speed) {
 }
 void Appendage::Elevator(double Joystick, bool a, bool b, bool x, bool y){
 
-	double PosA = 150;
-	double PosB = 2800;
-	double PosX = 5550;
-	double PosY = 150;
+	double PosA = 0;  //Encoder values for elevator must be updated if drum diameter changes
+	double PosB = 3860;
+	double PosX = 8200;
+	double PosY = 8200;
 	//double Encodererror;
 	double absJoystick = abs(Joystick);
 
@@ -102,10 +119,10 @@ void Appendage::Elevator(double Joystick, bool a, bool b, bool x, bool y){
 	else if (y){
 		ElevPID(PosY);
 	}
-	else if (absJoystick > .25){
+	else if (absJoystick > .75){
 		if (Joystick > 0){
-			Elevator1->Set(.25);
-			Elevator2->Set(.25);
+			Elevator1->Set(.75);
+			Elevator2->Set(.75);
 			Brake->Set(DoubleSolenoid::Value::kReverse);
 		}
 		else{
@@ -125,7 +142,7 @@ void Appendage::Elevator(double Joystick, bool a, bool b, bool x, bool y){
 
 
 }
-
+/*
 void Appendage::Ramp(bool Button1,bool btnleft, bool btnright,bool rampup1,bool rampup2){
 	if (Button1){
 		Ramp1->Set(DoubleSolenoid::Value::kForward);
@@ -155,7 +172,7 @@ void Appendage::Ramp(bool Button1,bool btnleft, bool btnright,bool rampup1,bool 
 		RampRight->Set(0);
 	}
 }
-
+*/
 void Appendage::ElevPID(double POS){
 
 	double EncoderDistance = ElevatorEncoder->GetDistance();
@@ -166,15 +183,15 @@ void Appendage::ElevPID(double POS){
 	double Encodererror = POS - EncoderDistance;
 	auto Gyrooutstr1 = std::to_string(Encodererror);
 	frc::SmartDashboard::PutString("DB/String 1",Gyrooutstr1);
-		if (abs (Encodererror) < 250){
+		if (abs (Encodererror) < 100){
 				Elevator1->Set(0);
 				Elevator2->Set(0);
 				Brake->Set(DoubleSolenoid::Value::kForward);
 			}
 		else {
-		if (Kp*Encodererror >.25){
-			Elevator1->Set(.25);
-			Elevator2->Set(.25);
+		if (Kp*Encodererror >.5){
+			Elevator1->Set(.5);
+			Elevator2->Set(.5);
 			Brake->Set(DoubleSolenoid::Value::kReverse);
 		}
 		else{
@@ -222,5 +239,44 @@ void Appendage::EncoderReset() {
 	ElevatorEncoder->Reset();
 
 
+
+}
+
+void Appendage::ClawWrist(bool ButtonUp, bool ButtonDown){
+
+	if (ButtonUp){
+		ClawWristSol->Set(DoubleSolenoid::Value::kForward);
+	}
+	else if (ButtonDown){
+		ClawWristSol->Set(DoubleSolenoid::Value::kReverse);
+	}
+
+
+}
+
+void Appendage::Climber(bool DropForks){
+
+	if (DropForks){
+		ClimberSol->Set(DoubleSolenoid::Value::kForward);
+		}
+	else{
+		ClimberSol->Set(DoubleSolenoid::Value::kReverse);
+	}
+}
+
+void Appendage::LEDs(bool btn1, bool btn2){
+
+	if (btn1){
+	WhiteLED->Set(Relay::Value::kForward);
+	}
+	else{
+	WhiteLED->Set(Relay::Value::kOff);
+	}
+	if(btn2){
+	AmberLED->Set(Relay::Value::kForward);
+	}
+	else{
+	AmberLED->Set(Relay::Value::kOff);
+	}
 
 }
