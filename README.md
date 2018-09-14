@@ -51,17 +51,3 @@ Please feel free to add sections to this readme or create others as you see fit 
 -------- Questions -------
 
 If you have any questions please contact Coach Eric.
-
-------- Major Commit History ---
-
-Combined Kevan and Chase branches on 1/19 into master, then recreated the branches.
-
-Combined Kevan1 and Chase1 branches on 1/26 into master, then recreated the branches. Also included labview driver station in this commit.
-
-------- Kevan's To-Do's ---------
-
-~ Scouting App
- 
- ------ Chase To- Do's ---------
- 
- ~ Have compressor auto turn off when drive wheels get 70% + PWM signal. (If we use a compressor on the robot)
